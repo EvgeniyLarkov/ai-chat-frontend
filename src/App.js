@@ -1,23 +1,40 @@
-import logo from './logo.svg';
 import './App.css';
 
+import React from 'react';
+
+import { Layout } from 'antd';
+import { autorun } from 'mobx';
+import {
+  Route,
+  Routes,
+  useLocation,
+} from 'react-router-dom';
+
+import HeaderComponent from './components/Header';
+import showNotifications from './components/Notifications';
+import ModalHandler from './core/ModalHandler';
+import RootStorage from './storage';
+
 function App() {
+  const location = useLocation();
+  const state = location.state;
+  const storage = new RootStorage();
+
+  autorun(() => {
+    showNotifications(storage.errorsHandler.errors)
+  })
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Routes location={state?.backgroundLocation || location}>
+
+        <Route path="/">
+          <Route index element={<Layout><HeaderComponent user={storage.userStorage} ui={storage.UIStorage} /></Layout>} />
+          <Route path="*" element={<div>Page 404</div>} />
+        </Route>
+      </Routes>
+
+      <ModalHandler storage={storage}></ModalHandler>
     </div>
   );
 }
