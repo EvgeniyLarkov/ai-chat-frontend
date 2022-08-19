@@ -16,6 +16,26 @@ const translation = {
                 'email-empty': "Укажите e-mail!",
                 'password-empty': 'Введите пароль',
             }
+        },
+        "register": {
+            'email': 'E-mail',
+            'password': 'Пароль',
+            'confirm-password': 'Подтвердите пароль',
+            'firstName': 'Имя',
+            'firstName-tooltip': 'Валерий',
+            'secondName': 'Фамилия',
+            'secondName-tooltip': 'Жмышенко',
+            'submit': 'Зарегестрироваться',
+            errors: {
+                'email-empty': "Укажите e-mail!",
+                'email-invalid': "Некорректный e-mail!",
+                'password-empty': 'Введите пароль',
+                'password-short': 'Минимальная длина пароля составляет 6 символов',
+                'password-not-confirmed': 'Подтвердите пароль!',
+                'password-not-match': 'Пароли не совпадают',
+                'firstName-empty': 'Введите Ваше имя',
+                'secondName-empty': 'Введите Вашу фамилию',
+            }
         }
     }
 }

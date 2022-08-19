@@ -100,6 +100,7 @@ const ChangeLanguageEL = observer(({ ui }) => {
 
     const iconsByLang = {
         'ru': <IconRU />,
+        'ru-RU': <IconRU />,
         'en': <IconEN />
     }
 

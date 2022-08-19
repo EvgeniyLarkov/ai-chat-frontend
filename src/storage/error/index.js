@@ -1,5 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
+import { isDevelopment } from '../../utils';
+
 class ErrorStore {
     errors = [];
 
@@ -18,7 +20,29 @@ class ErrorStore {
         } else {
             name = error.response.statusText;
             description = error.response.statusText;
-            code = error.status;
+            code = error.response.status;
+        }
+
+        if (error.response?.data?.errors) {
+            const allErrors = error.response.data.errors;
+            description = [];
+
+            for (let errorKey in allErrors) {
+                const errorText = `${errorKey}: ${allErrors[errorKey]}`
+                description = [...description, errorText]; 
+            }
+
+            description.join(', ');
+        }
+
+        const normalizedError = {
+            name,
+            description,
+            code
+        };
+
+        if(isDevelopment()) {
+            console.log(error, normalizedError);
         }
 
         this.errors = [{

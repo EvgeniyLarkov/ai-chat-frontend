@@ -12,11 +12,14 @@ import {
   runInAction,
 } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useTranslation } from 'react-i18next';
 
 import { availableModals } from '../../../storage/ui';
 import { UserLoginStates } from '../../../storage/user';
 
 const RegisterModal = observer(({ user, ui }) => {
+    const { t } = useTranslation();
+
     const [registerPending, setRegisterPending] = useState(false);
     const [form] = useForm();
 
@@ -57,15 +60,15 @@ const RegisterModal = observer(({ user, ui }) => {
             >
                 <Form.Item
                     name="email"
-                    label="E-mail"
+                    label={t('register.email')}
                     rules={[
                         {
                             type: 'email',
-                            message: 'The input is not valid E-mail!',
+                            message: t('register.errors.email-invalid'),
                         },
                         {
                             required: true,
-                            message: 'Please input your E-mail!',
+                            message: t('register.errors.email-empty'),
                         },
                     ]}
                 >
@@ -74,15 +77,15 @@ const RegisterModal = observer(({ user, ui }) => {
 
                 <Form.Item
                     name="password"
-                    label="Password"
+                    label={t('register.password')}
                     rules={[
                         {
                             required: true,
-                            message: 'Please input your password!',
+                            message: t('register.errors.password-empty'),
                         },
                         {
                             min: 6,
-                            message: 'Minimal length is 6 symbols',
+                            message: t('register.errors.password-short'),
                         }
                     ]}
                     hasFeedback
@@ -92,13 +95,13 @@ const RegisterModal = observer(({ user, ui }) => {
 
                 <Form.Item
                     name="confirm"
-                    label="Confirm Password"
+                    label={t('register.confirm-password')}
                     dependencies={['password']}
                     hasFeedback
                     rules={[
                         {
                             required: true,
-                            message: 'Please confirm your password!',
+                            message: t('register.errors.password-not-confirmed'),
                         },
                         ({ getFieldValue }) => ({
                             validator(_, value) {
@@ -106,7 +109,7 @@ const RegisterModal = observer(({ user, ui }) => {
                                     return Promise.resolve();
                                 }
 
-                                return Promise.reject(new Error('The two passwords that you entered do not match!'));
+                                return Promise.reject(new Error(t('register.errors.password-not-match')));
                             },
                         }),
                     ]}
@@ -116,12 +119,12 @@ const RegisterModal = observer(({ user, ui }) => {
 
                 <Form.Item
                     name="firstName"
-                    label="firstName"
-                    tooltip="Your first name"
+                    label={t('register.firstName')}
+                    tooltip={t('register.firstName-tooltip')}
                     rules={[
                         {
                             required: true,
-                            message: 'Please input your first name!',
+                            message: t('register.errors.firstName-empty'),
                             whitespace: true,
                         },
                     ]}
@@ -131,12 +134,12 @@ const RegisterModal = observer(({ user, ui }) => {
 
                 <Form.Item
                     name="secondName"
-                    label="secondName"
-                    tooltip="Your second name"
+                    label={t('register.secondName')}
+                    tooltip={t('register.secondName-tooltip')}
                     rules={[
                         {
                             required: true,
-                            message: 'Please input your second name!',
+                            message: t('register.errors.secondName-empty'),
                             whitespace: true,
                         },
                     ]}
@@ -146,7 +149,7 @@ const RegisterModal = observer(({ user, ui }) => {
 
                 <Form.Item>
                     <Button type="primary" htmlType="submit" block={true} loading={registerPending}>
-                        Register
+                        {t('register.submit')}
                     </Button>
                 </Form.Item>
             </Form>
