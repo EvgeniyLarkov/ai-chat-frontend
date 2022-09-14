@@ -19,7 +19,7 @@ class AuthProvider {
         }
     }
 
-    get getToken() {
+    get getToken() { //TO-DO
         return localStorage.getItem(this.tokenName);
     }
 

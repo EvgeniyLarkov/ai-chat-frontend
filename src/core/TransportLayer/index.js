@@ -39,14 +39,14 @@ class TransportLayer {
 
         const routeText = endpoint.url(options);
 
-        const token = this.authProvider.getToken();
+        const token = this.authProvider.token;
 
         return axios({
             method: endpoint.method,
             url: this.getUrl(routeText),
             data,
             headers: { 
-                ...(token ?? { Authorization: `Bearer ${token}` })
+               Authorization: `Bearer ${token}`
             }
         })
             .then((res) => res.data)

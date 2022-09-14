@@ -14,6 +14,8 @@ import HeaderComponent from './components/Header';
 import showNotifications from './components/Notifications';
 import ModalHandler from './core/ModalHandler';
 import RootStorage from './storage';
+import { Content } from 'antd/lib/layout/layout';
+import ChatComponent from './components/Chat';
 
 function App() {
   const location = useLocation();
@@ -29,7 +31,10 @@ function App() {
       <Routes location={state?.backgroundLocation || location}>
 
         <Route path="/">
-          <Route index element={<Layout><HeaderComponent user={storage.userStorage} ui={storage.UIStorage} /></Layout>} />
+          <Route index element={<Layout>
+            <HeaderComponent user={storage.userStorage} ui={storage.UIStorage} />
+            <Content><ChatComponent chat={storage.chatStorage}></ChatComponent></Content>
+          </Layout>} />
           <Route path="*" element={<div>Page 404</div>} />
         </Route>
       </Routes>
