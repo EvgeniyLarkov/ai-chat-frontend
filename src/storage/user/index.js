@@ -7,7 +7,6 @@ import {
   isSuccessRequest,
   isUnsuccessRequest,
 } from '../../utils/requestHelper';
-import AuthProvider from './auth';
 
 export const UserLoginStates = {
     logined: 'logined',
@@ -21,13 +20,13 @@ class User {
     email = null;
     id = null;
 
-    constructor(transportLayer) {
+    constructor(transportLayer, authProvider) {
         makeAutoObservable(this);
+        this.authProvider = authProvider;
         this.transportLayer = transportLayer;
-        this.AuthProvider = new AuthProvider();
 
-        if(!!this.AuthProvider.token) {
-            const userData = this.AuthProvider.getLocalUserData();
+        if(!!this.authProvider.token) {
+            const userData = this.authProvider.getLocalUserData();
 
             if (userData) {
                 this.setUserData(userData);
@@ -57,8 +56,8 @@ class User {
 
             this.setUserData(user);
 
-            this.AuthProvider.setToken(token);
-            this.AuthProvider.saveLocalUserData(user);
+            this.authProvider.setToken(token);
+            this.authProvider.saveLocalUserData(user);
     
             return isSuccessRequest(response);
         })
@@ -77,7 +76,7 @@ class User {
         this.id = null;
         this.email = null;
 
-        this.AuthProvider.clearUserData();
+        this.authProvider.clearUserData();
     }
 }
 
