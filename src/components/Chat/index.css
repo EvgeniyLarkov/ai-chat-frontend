@@ -1,0 +1,24 @@
+.chat-outer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-inner {
+    margin: 5vh 5vw;
+
+    max-width: 800px;
+    width: 100%;
+    overflow: hidden;
+
+    display: flex;
+}
+
+.chat-dialogs-inner {
+    overflow: auto;
+    overflow: overlay;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}

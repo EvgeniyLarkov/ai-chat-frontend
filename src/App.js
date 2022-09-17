@@ -2,7 +2,6 @@ import './App.css';
 
 import React from 'react';
 
-import { Layout } from 'antd';
 import { autorun } from 'mobx';
 import {
   Route,
@@ -10,12 +9,10 @@ import {
   useLocation,
 } from 'react-router-dom';
 
-import HeaderComponent from './components/Header';
 import showNotifications from './components/Notifications';
 import ModalHandler from './core/ModalHandler';
 import RootStorage from './storage';
-import { Content } from 'antd/lib/layout/layout';
-import ChatComponent from './components/Chat';
+import { ChatLayout } from './layouts/chat';
 
 function App() {
   const location = useLocation();
@@ -31,10 +28,7 @@ function App() {
       <Routes location={state?.backgroundLocation || location}>
 
         <Route path="/">
-          <Route index element={<Layout>
-            <HeaderComponent user={storage.userStorage} ui={storage.UIStorage} />
-            <Content><ChatComponent chat={storage.chatStorage}></ChatComponent></Content>
-          </Layout>} />
+          <Route index element={<ChatLayout storage={storage}></ChatLayout>} />
           <Route path="*" element={<div>Page 404</div>} />
         </Route>
       </Routes>

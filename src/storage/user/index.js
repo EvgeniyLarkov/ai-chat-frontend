@@ -19,6 +19,7 @@ class User {
     name = null;
     email = null;
     id = null;
+    hash = null;
 
     constructor(transportLayer, authProvider) {
         makeAutoObservable(this);
@@ -40,6 +41,7 @@ class User {
         this.id = user.id;
         this.email = user.email;
         this.name = user.firstName;
+        this.hash = user.hash;
     }
 
     async login(data) {

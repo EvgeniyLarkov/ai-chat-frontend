@@ -1,17 +1,22 @@
 import axios from 'axios';
+import { makeAutoObservable } from 'mobx';
+import { apiVersion, serverHost, serverPort } from './config';
 import endpoints from './routes';
+import SocketsConnectionHandler from './sockets';
 
 class TransportLayer {
-    serverHost = '127.0.0.1';
-    serverPort = 3000;
-    apiVersion = 'v1';
+    serverHost = serverHost;
+    serverPort = serverPort;
+    apiVersion = apiVersion;
 
     routes = endpoints;
 
     constructor(errorsHandler, authProvider) {
+        makeAutoObservable(this);
         this.serverURL = this.serverHost + ":" + this.serverPort;
         this.authProvider = authProvider;
         this.errorsHandler = errorsHandler;
+        this.socketsHandler = new SocketsConnectionHandler(authProvider);
     }
 
     async adminLogin(data) {
@@ -28,6 +33,10 @@ class TransportLayer {
 
     async getChatDialogs(options) {
         return this.makePost(this.routes.getDialogs, options)
+    }
+
+    async getDialogMessages(options) {
+        return this.makePost(this.routes.getDialogMessages, options)
     }
 
     getUrl(route) {
