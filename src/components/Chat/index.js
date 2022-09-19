@@ -6,6 +6,7 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChatStates } from '../../storage/chat';
 import DialogCard from './DialogCard';
+import ChatWindowComponent from './ChatWindow';
 
 const ChatComponent = observer(({ chat, user }) => {
     const { t } = useTranslation();
@@ -14,7 +15,17 @@ const ChatComponent = observer(({ chat, user }) => {
         if (chat.allDialogsState === ChatStates.unfetched) {
             action(() => chat.getChatDialogs())();
         }
-    }, [chat, chat.allDialogsState])
+    }, [chat.allDialogsState])
+
+    const dialogSelectHandler = (dialogUuid) => () => {
+        if (
+            chat.currentDialog !== dialogUuid
+            && chat.allDialogsState !== ChatStates.pending
+        ) {
+            action(() => chat.changeCurrentDialog(dialogUuid))();
+        }
+
+    }
 
     return (<div className="chat-outer">
         <div className="chat-inner">
@@ -31,17 +42,21 @@ const ChatComponent = observer(({ chat, user }) => {
                         const opponentHash = participants.find((participant) => participant !== user.hash);
                         const { firstName, lastName, logo } = chat.getChatUserData(opponentHash);
 
-                        return <DialogCard
-                            message={message}
-                            readed={readed}
-                            name={`${firstName} ${lastName}`}
-                            logo={logo}
-                            key={uuid}>
-                        </DialogCard>
+                        return <div onClick={dialogSelectHandler(uuid)} key={uuid}>
+                            <DialogCard
+                                message={message}
+                                readed={readed}
+                                name={`${firstName} ${lastName}`}
+                                logo={logo}
+                            >
+                            </DialogCard>
+                        </div>
                     })}
                 </div>
             </div>
-            <div className="chat-messages-container"></div>
+            <div className="chat-messages-container">
+                <ChatWindowComponent chat={chat} user={user}></ChatWindowComponent>
+            </div>
         </div>
     </div>)
 })

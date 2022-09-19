@@ -7,12 +7,12 @@ const DialogCard = ({
   message,
   readed,
   name,
-  logo,
+  logo = null,
+  selected = false,
 }) => {
   return (<Card
     style={{
-      width: 300,
-      marginTop: 16,
+      width: 250,
     }}
   >
     <Meta

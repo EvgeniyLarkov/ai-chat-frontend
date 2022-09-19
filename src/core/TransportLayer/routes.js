@@ -5,7 +5,7 @@ const endpoints = {
     'createDialog': { url: () => `chat`, method: 'POST' },
     'getDialogs': { url: ({ limit = 20, offset = 0 }) => `chat?limit=${limit}&offset=${offset}`, method: 'GET' },
     'getDialog': { url: ({ hash }) => `chat/${hash}`, method: 'GET' },
-    'getDialogMessages': { url: ({ hash, limit = 40, offset = 0 }) => `chat/${hash}?limit=${limit}&offset=${offset}`, method: 'GET' },
+    'getDialogMessages': { url: ({ hash, limit = 50, offset = 0 }) => `chat/${hash}/messages?limit=${limit}&offset=${offset}`, method: 'GET' },
     'postDialogMessage': { url: ({ hash }) => `chat/${hash}`, method: 'POST' },
 };
 
