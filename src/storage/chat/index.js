@@ -33,7 +33,7 @@ class Chat {
         this.messages = [];
 
         if (uuid !== null) {
-            this.getDialogMessages(uuid);
+            runInAction(() => { this.getDialogMessages(uuid) });
         }
     }
 
@@ -56,7 +56,7 @@ class Chat {
     async getDialogMessages(uuid, offset = 0, limit = 50) { // TO-DO
         this.dialogMessagesState = ChatStates.pending;
 
-        const response = await this.transportLayer.getDialogMessages({
+        const { data } = await this.transportLayer.getDialogMessages({
             limit,
             offset,
             hash: uuid
@@ -65,7 +65,7 @@ class Chat {
         return runInAction(() => {
             this.dialogMessagesState = ChatStates.fectched;
 
-            response.forEach((msg) => {
+            data.forEach((msg) => {
                 this.updateMessageFromServer(msg);
             })
 
@@ -122,16 +122,22 @@ class Chat {
     updateMessageFromServer(message) {
         const {
             uuid,
+            sender,
             ...data
         } = message;
+
+        const messageData = {
+            sender: sender ? sender.hash : null,
+            ...data
+        }
 
         if (this.messagesByHash[uuid]) {
             this.messagesByHash[uuid] = {
                 ...this.messagesByHash[uuid],
-                ...data
+                ...messageData
             }
         } else {
-            this.messagesByHash[uuid] = data;
+            this.messagesByHash[uuid] = messageData;
             this.messages.push(uuid);
         }
     }
