@@ -11,13 +11,14 @@ import {
 
 import showNotifications from './components/Notifications';
 import ModalHandler from './core/ModalHandler';
-import RootStorage from './storage';
+import RootStorage, { StoreProvider } from './storage';
 import { ChatLayout } from './layouts/chat';
+
+const storage = new RootStorage();
 
 function App() {
   const location = useLocation();
   const state = location.state;
-  const storage = new RootStorage();
 
   autorun(() => {
     showNotifications(storage.errorsHandler.errors)
@@ -25,15 +26,17 @@ function App() {
 
   return (
     <div className="App">
-      <Routes location={state?.backgroundLocation || location}>
+      <StoreProvider store={storage}>
+        <Routes location={state?.backgroundLocation || location}>
 
-        <Route path="/">
-          <Route index element={<ChatLayout storage={storage}></ChatLayout>} />
-          <Route path="*" element={<div>Page 404</div>} />
-        </Route>
-      </Routes>
+          <Route path="/">
+            <Route index element={<ChatLayout storage={storage}></ChatLayout>} />
+            <Route path="*" element={<div>Page 404</div>} />
+          </Route>
+        </Routes>
 
-      <ModalHandler storage={storage}></ModalHandler>
+        <ModalHandler storage={storage}></ModalHandler>
+      </StoreProvider>
     </div>
   );
 }

@@ -1,30 +1,35 @@
 import './index.css';
 
-import { action } from 'mobx';
+import { action, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChatStates } from '../../storage/chat';
 import DialogCard from './DialogCard';
 import ChatWindowComponent from './ChatWindow';
+import { useStore } from '../../storage';
 
-const ChatComponent = observer(({ chat, user }) => {
+const ChatComponent = observer(() => {
+    const { chat, chatUI, userStorage } = useStore();
+
     const { t } = useTranslation();
 
     useEffect(() => {
         if (chat.allDialogsState === ChatStates.unfetched) {
             action(() => chat.getChatDialogs())();
         }
-    }, [chat.allDialogsState])
+    }, [chat, chat.allDialogsState])
 
     const dialogSelectHandler = (dialogUuid) => () => {
         if (
             chat.currentDialog !== dialogUuid
             && chat.allDialogsState !== ChatStates.pending
         ) {
-            action(() => chat.changeCurrentDialog(dialogUuid))();
+            runInAction(() => {
+                chat.changeCurrentDialog(dialogUuid);
+                chatUI.setChatInBottom(true);
+            })
         }
-
     }
 
     return (<div className="chat-outer">
@@ -32,20 +37,24 @@ const ChatComponent = observer(({ chat, user }) => {
             <div className="chat-dialogs-list">
                 <div className="chat-dialogs-inner">
                     {chat.dialogs.slice().map((uuid) => {
-                        const { messageUuid, name, participants } = chat.getDialogData(uuid);
+                        const { messageUuid, participants, isTyping } = chat.getDialogData(uuid);
                         const {
                             message = null,
                             readed = null,
-                            senderUuid = null
                         } = chat.getMessageData(messageUuid);
 
-                        const opponentHash = participants.find((participant) => participant !== user.hash);
-                        const { firstName, lastName, logo } = chat.getChatUserData(opponentHash);
+                        const opponentHash = participants.find((participant) => participant !== userStorage.hash);
+                        const { firstName, lastName, logo, isOnline } = chat.getChatUserData(opponentHash);
+
+                        console.log(isOnline)
 
                         return <div onClick={dialogSelectHandler(uuid)} key={uuid}>
                             <DialogCard
+                                key={`${uuid}_chat`}
                                 message={message}
                                 readed={readed}
+                                isOnline={isOnline}
+                                isTyping={isTyping}
                                 name={`${firstName} ${lastName}`}
                                 logo={logo}
                             >
@@ -55,7 +64,11 @@ const ChatComponent = observer(({ chat, user }) => {
                 </div>
             </div>
             <div className="chat-messages-container">
-                <ChatWindowComponent chat={chat} user={user}></ChatWindowComponent>
+                {
+                    chat.currentDialog ?
+                        <ChatWindowComponent />
+                        : ''
+                }
             </div>
         </div>
     </div>)

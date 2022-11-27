@@ -2,10 +2,6 @@
     display: flex;
 }
 
-.chat-message-wrapper.self-message {
-    justify-content: end;
-}
-
 .chat-message {
     border-radius: 0px 10px 10px 10px;
     border: 1px solid rgba(112, 124, 151, 0.25);
@@ -14,11 +10,13 @@
     box-shadow: 10px 10px 25px rgba(112, 124, 151, 0.05), 15px 15px 35px rgba(112, 124, 151, 0.05);
 }
 
-.chat-message-wrapper.self-message .chat-message {
-    background: linear-gradient(90.54deg, #60A9F6 0%, #2A8BF2 100%);
-    color: #FFFFFF;
+.chat-message-wrapper.self-message {
+    justify-content: end;
+    padding-right: 20px;
 }
 
-.chat-message-inner {
-
+.chat-message-wrapper.self-message .chat-message {
+    border-radius: 10px 0px 10px 10px;
+    background: linear-gradient(90.54deg, #60A9F6 0%, #2A8BF2 100%);
+    color: #FFFFFF;
 }

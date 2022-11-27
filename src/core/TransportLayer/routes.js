@@ -9,4 +9,10 @@ const endpoints = {
     'postDialogMessage': { url: ({ hash }) => `chat/${hash}`, method: 'POST' },
 };
 
+export const wsEndpoints = {
+    'sendDialogMessage': { url: () => ``, namespace: 'chat', event: 'message' },
+    'getDialogMetadata': { url: () => ``, namespace: 'chat', event: 'dialog-metadata' },
+    'userTyping': { url: () => ``, namespace: 'chat', event: 'user-typing' },
+}
+
 export default endpoints;

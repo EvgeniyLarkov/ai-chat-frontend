@@ -10,7 +10,7 @@ export const ChatLayout = observer(({ storage }) => {
     return (<Layout style={{ height: "100vh" }}>
         <HeaderComponent user={storage.userStorage} ui={storage.UIStorage} />
         <Content>
-            <ChatComponent chat={storage.chatStorage} user={storage.userStorage}></ChatComponent>
+            <ChatComponent />
         </Content>
     </Layout>)
 });

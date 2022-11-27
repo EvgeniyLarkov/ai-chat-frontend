@@ -1,5 +1,5 @@
 import {
-    makeAutoObservable, runInAction,
+    makeAutoObservable, runInAction, toJS,
 } from 'mobx';
 
 export const ChatStates = {
@@ -24,6 +24,10 @@ class Chat {
         makeAutoObservable(this)
 
         this.transportLayer = transportLayer;
+
+        this.transportLayer.createWsConnection('chat');
+
+        this.startGetOnlineDialogs();
     }
 
     changeCurrentDialog(uuid) {
@@ -69,8 +73,24 @@ class Chat {
                 this.updateMessageFromServer(msg);
             })
 
+            this.messages = this.messages.sort((hash1, hash2) => {
+                return this.messagesByHash[hash2].createdAt - this.messagesByHash[hash1].createdAt;
+            })
+
             return true;
         })
+    }
+
+    //TO-DO
+    partialUpdateDialogFromServer(dialog) {
+        const {
+            uuid,
+            ...data
+        } = dialog;
+
+        const currentData = this.dialogsByHash[uuid];
+
+        this.dialogsByHash[uuid] = { ...currentData, ...data };
     }
 
     updateDialogFromServer(dialog) {
@@ -86,6 +106,7 @@ class Chat {
             participants: dialog.participants.map((user) => user.hash),
             updatedAt: dialog.uuid,
             messageUuid: dialog.__last__ ? dialog.__last__.messageUuid : null,
+            isTyping: !!dialog.isTyping,
         }
 
         if (dialog.__last__) {
@@ -115,8 +136,13 @@ class Chat {
         }
 
         dialog.participants.forEach((user) => {
-            this.dialogsUsersData[user.hash] = user;
+            this.updateChatUser(user);
         })
+    }
+
+    updateChatUser(user) {
+        console.log(user)
+        this.dialogsUsersData[user.hash] = { ...this.dialogsUsersData[user.hash], ...user };
     }
 
     updateMessageFromServer(message) {
@@ -127,8 +153,10 @@ class Chat {
         } = message;
 
         const messageData = {
+            ...data,
             sender: sender ? sender.hash : null,
-            ...data
+            createdAt: new Date(message.createdAt),
+            updatedAt: new Date(message.updatedAt),
         }
 
         if (this.messagesByHash[uuid]) {
@@ -136,10 +164,48 @@ class Chat {
                 ...this.messagesByHash[uuid],
                 ...messageData
             }
+
+            if (!this.messages.includes(uuid)) {
+                this.messages.unshift(uuid);
+            }
+
         } else {
             this.messagesByHash[uuid] = messageData;
-            this.messages.push(uuid);
+            this.messages.unshift(uuid);
         }
+    }
+
+    async sendMessageToDialog(chatUUID, message) {
+        return runInAction(() => {
+            this.transportLayer.wsSendMessageToDialog({ 
+                data: {
+                    message,
+                    uuid: chatUUID,
+                }
+            })
+        });
+    }
+
+    userTyping(dialogUUID) {
+        this.transportLayer.wsSendUserTyping({
+            data: { dialogUUID }
+        })
+    }
+
+    startGetOnlineDialogs() {
+        const onlineIntreval = 5000;
+
+        const stopId = setInterval(async () => {
+            let userHashes = Object.getOwnPropertyNames(this.dialogsUsersData);
+
+            await this.transportLayer.wsGetDialogsMetadata({
+                data: {
+                    onlineUsers: userHashes,
+                }
+            });
+        }, onlineIntreval)
+
+        return () => { clearInterval(stopId) }
     }
 
     getDialogData(uuid) {
