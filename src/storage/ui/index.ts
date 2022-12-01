@@ -1,8 +1,5 @@
 import i18next from 'i18next';
-import {
-	makeAutoObservable,
-	runInAction,
-} from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 
 export const availableModals = {
 	login: 'login',
@@ -12,7 +9,8 @@ export const availableModals = {
 
 class UI {
 	currentModal = null;
-	lang: string = '';
+
+	lang = '';
 
 	constructor() {
 		makeAutoObservable(this);
@@ -21,7 +19,9 @@ class UI {
 
 	changeLanguage(lang: string) {
 		i18next.changeLanguage(lang).then(() => {
-			runInAction(() => this.lang = lang);
+			runInAction(() => {
+				this.lang = lang;
+			});
 		});
 	}
 }

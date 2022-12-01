@@ -1,25 +1,31 @@
-import {WsNamespaces} from 'core/TransportLayer/types';
-import {makeAutoObservable} from 'mobx';
+import { WsNamespaces } from 'core/TransportLayer/types';
+import { makeAutoObservable } from 'mobx';
 import type Chat from 'storage/chat';
 import ChatReactions from './chat';
 
-export type ServerToClientEvents = InstanceType<typeof Reactions>['byNamespace'];
+export type ServerToClientEvents = InstanceType<
+	typeof Reactions
+>['byNamespace'];
 
 class Reactions {
-    chatStorage: Chat;
-    
-    chatReactions: ChatReactions;
+	chatStorage: Chat;
 
-    byNamespace: { [WsNamespaces.chat]: InstanceType<typeof ChatReactions>['byName']; }
+	chatReactions: ChatReactions;
+
+	byNamespace: {
+		[WsNamespaces.chat]: InstanceType<typeof ChatReactions>['byName'];
+	};
 
 	constructor(chatStorage: Chat) {
 		makeAutoObservable(this);
 
 		this.chatStorage = chatStorage;
 
-        this.chatReactions = new ChatReactions(this.chatStorage);
+		this.chatReactions = new ChatReactions(this.chatStorage);
 
-        this.byNamespace[WsNamespaces.chat] = this.chatReactions.byName;
+		this.byNamespace = {
+			[WsNamespaces.chat]: this.chatReactions.byName,
+		};
 	}
 }
 

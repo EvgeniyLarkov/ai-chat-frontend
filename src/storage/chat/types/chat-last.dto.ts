@@ -1,6 +1,6 @@
-import {type UserDto} from 'storage/user/types';
-import {type ChatDialogDto} from './chat-dialog.dto';
-import {type ChatMessageDto} from './chat-message.dto';
+import { type UserDto } from 'storage/user/types';
+import { type ChatDialogDto } from './chat-dialog.dto';
+import { type ChatMessageDto } from './chat-message.dto';
 
 export type ChatLastMessageDto = {
 	dialogUuid: ChatDialogDto['uuid'];

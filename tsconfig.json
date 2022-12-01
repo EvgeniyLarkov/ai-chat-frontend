@@ -4,7 +4,7 @@
       "target": "es5",
       "jsx": "react",
       "module": "es6",
-      "moduleResolution": "node",
+      "moduleResolution": "Node",
       "allowSyntheticDefaultImports": true,
       "useDefineForClassFields": true,
       "emitDecoratorMetadata": true,
@@ -15,11 +15,11 @@
       "noUnusedLocals": true,
       "removeComments": true,
       "strictNullChecks": true,
-      "outDir": "build",
+      "outDir": "dist",
       "lib": ["es6", "es7", "dom"],
-      "baseUrl": "src",
+      "baseUrl": "./src",
       "paths": {
-        "app/*": ["./app/*"]
+        "src/*": ["./src/*"]
       }
     },
     "exclude": ["dist", "node_modules", "**/.*"]

@@ -1,14 +1,14 @@
 import './index.css';
 
-import React, {useEffect, useRef, useState} from 'react';
-import {observer} from 'mobx-react-lite';
-import {Button, Input} from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { Button, Input } from 'antd';
 import ChatMessageComponent from '../ChatMessage';
-import {useStore} from '../../../storage';
+import { useStore } from '../../../storage';
 import useThrottle from '../../../hooks/useThrottle';
 
 const ChatWindowComponent = observer(() => {
-	const {chat, chatUi, userStorage} = useStore();
+	const { chat, chatUi, userStorage } = useStore();
 
 	const [value, setValue] = useState('');
 
@@ -57,21 +57,20 @@ const ChatWindowComponent = observer(() => {
 	}, [throttledValue]);
 
 	const handleInput = (event: React.UIEvent<HTMLInputElement>) => {
-		const value = event.currentTarget.value.trim();
+		const inputValue = event.currentTarget.value.trim();
 
-		setValue(value);
+		setValue(inputValue);
 	};
 
-	const handleSubmit = () => {
+	const handleSubmit = (): void => {
 		if (value === '' || sendingMessage) {
-			return null;
+			return;
 		}
 
 		setSendingMessage(true);
-		chat.sendMessageToDialog(chatDialog, value)
-			.finally(() => {
-				setSendingMessage(false);
-			});
+		chat.sendMessageToDialog(chatDialog, value).finally(() => {
+			setSendingMessage(false);
+		});
 	};
 
 	useEffect(() => {
@@ -85,49 +84,70 @@ const ChatWindowComponent = observer(() => {
 
 		const container = event.currentTarget;
 
-		const {scrollHeight} = container;
-		const {clientHeight} = container;
+		const { scrollHeight } = container;
+		const { clientHeight } = container;
 
 		if (scrollHeight <= clientHeight) {
 			return;
 		}
 
-		const {scrollTop} = container;
+		const { scrollTop } = container;
 
-		const isInBottom = (scrollHeight - clientHeight - scrollTop) < isInBottomOffset;
+		const isInBottom =
+			scrollHeight - clientHeight - scrollTop < isInBottomOffset;
 
 		chatUi.setChatInBottom(isInBottom);
 	};
 
-	return (<div className='chat-window'>
-		<div className='chat-window-inner'>
-			{chat.currentDialog !== null
-				? <div className='chat-window-messages' onScroll={handleChatScrolling} ref={chatWindowRef}>
-					{chatMessages.slice().reverse().map(msgUuid => {
-						const data = chat.getMessageData(msgUuid);
+	return (
+		<div className="chat-window">
+			<div className="chat-window-inner">
+				{chat.currentDialog !== null ? (
+					<div
+						className="chat-window-messages"
+						onScroll={handleChatScrolling}
+						ref={chatWindowRef}
+					>
+						{chatMessages
+							.slice()
+							.reverse()
+							.map((msgUuid) => {
+								const data = chat.getMessageData(msgUuid);
 
-						return <ChatMessageComponent
-							message={data.message}
-							isSelfMessage={userHash === data.sender}
-							key={msgUuid}
-						></ChatMessageComponent>;
-					})}
-				</div> : ''}
-			<div className='chat-window-actions'>
-				<Input.Group compact>
-					<Input
-						style={{
-							width: 'calc(100% - 200px)',
-						}}
-						value={value}
-						disabled={sendingMessage}
-						onInput={handleInput}
-					/>
-					<Button type='primary' onClick={handleSubmit} loading={sendingMessage}>Send</Button>
-				</Input.Group>
+								return (
+									<ChatMessageComponent
+										message={data.message}
+										isSelfMessage={userHash === data.sender}
+										key={msgUuid}
+									/>
+								);
+							})}
+					</div>
+				) : (
+					''
+				)}
+				<div className="chat-window-actions">
+					<Input.Group compact>
+						<Input
+							style={{
+								width: 'calc(100% - 200px)',
+							}}
+							value={value}
+							disabled={sendingMessage}
+							onInput={handleInput}
+						/>
+						<Button
+							type="primary"
+							onClick={handleSubmit}
+							loading={sendingMessage}
+						>
+							Send
+						</Button>
+					</Input.Group>
+				</div>
 			</div>
 		</div>
-	</div>);
+	);
 });
 
 export default ChatWindowComponent;

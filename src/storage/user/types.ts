@@ -38,4 +38,7 @@ export type UserLoginData = Pick<UserDto, 'email'> & {
 	password: string;
 };
 
-export type UserLocaleData = Pick<UserDto, 'id' | 'email' | 'firstName' | 'hash'>;
+export type UserLocaleData = Pick<
+	UserDto,
+	'id' | 'email' | 'firstName' | 'hash'
+>;

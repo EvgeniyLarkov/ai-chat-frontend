@@ -1,12 +1,11 @@
-import {
-	computed,
-	makeAutoObservable,
-} from 'mobx';
-import {type UserLocaleData} from 'storage/user/types';
+import { computed, makeAutoObservable } from 'mobx';
+import { type UserLocaleData } from 'storage/user/types';
 
 class AuthProvider {
-	token: string | undefined = null;
+	token: string | null = null;
+
 	tokenName = 'jwt_auth_token';
+
 	userDataName = 'user_data';
 
 	constructor() {
@@ -20,7 +19,8 @@ class AuthProvider {
 		}
 	}
 
-	get getToken() { // TO-DO
+	get getToken() {
+		// TO-DO
 		return localStorage.getItem(this.tokenName);
 	}
 
@@ -35,9 +35,13 @@ class AuthProvider {
 
 	getLocalUserData() {
 		const data = localStorage.getItem(this.userDataName);
-		try {
-			return JSON.parse(data) as UserLocaleData;
-		} catch (e: unknown) {
+		if (data) {
+			try {
+				return JSON.parse(data) as UserLocaleData;
+			} catch (e: unknown) {
+				return null;
+			}
+		} else {
 			return null;
 		}
 	}

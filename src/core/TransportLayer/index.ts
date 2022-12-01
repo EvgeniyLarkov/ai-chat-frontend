@@ -1,57 +1,89 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import AuthProvider from 'core/AuthProvider';
-import {makeAutoObservable} from 'mobx';
+import { makeAutoObservable } from 'mobx';
 import type ErrorStore from 'storage/error';
 import Reactions, { ServerToClientEvents } from 'storage/reactions';
-import {apiVersion, serverHost, serverPort} from './config';
+import { transformError } from 'utils/transformError';
+import { apiVersion, serverHost, serverPort } from './config';
 import { ChatDialogsResponse, ChatMessagesResponse } from './dto/chat';
 import { UserLoginResponse } from './dto/user';
-import endpoints, {wsEndpoints} from './routes';
+import endpoints, { wsEndpoints } from './routes';
 import SocketsConnectionHandler from './sockets';
-import { ClientsToServerEvents, EndpointObject, RequestOptions, WsEndpointObject, WsNamespaces, WsRequestOptions } from './types';
+import {
+	ClientsToServerEvents,
+	EndpointObject,
+	RequestOptions,
+	UnsuccssesRequest,
+	WsEndpointObject,
+	WsNamespaces,
+	WsRequestOptions,
+} from './types';
 
 type wsConnections = {
-    [namespace in WsNamespaces]?: SocketsConnectionHandler<
-        ServerToClientEvents[namespace],
-        Partial<ClientsToServerEvents[namespace]>
-    >
-}
+	[namespace in WsNamespaces]?: SocketsConnectionHandler<
+		ServerToClientEvents[namespace],
+		Partial<ClientsToServerEvents[namespace]>
+	>;
+};
 
 class TransportLayer {
-    authProvider: AuthProvider
-    errorsHandler: ErrorStore
-	reactionsHandler: Reactions;
+	authProvider: AuthProvider;
+
+	errorsHandler: ErrorStore;
+
+	reactionsHandler: Reactions | null = null;
 
 	serverHost = serverHost;
+
 	serverPort = serverPort;
+
 	apiVersion = apiVersion;
 
 	routes = endpoints;
+
 	wsRoutes = wsEndpoints;
 
-	wsConnections: wsConnections;
+	wsConnections?: wsConnections;
 
-	constructor(errorsHandler: ErrorStore, authProvider: AuthProvider, reactions: Reactions) {
+	reactionsHandlerConnectPromise: Promise<void>;
+
+	applyReactionsHandler: (handler: Reactions) => void;
+
+	constructor(errorsHandler: ErrorStore, authProvider: AuthProvider) {
 		makeAutoObservable(this);
 		this.authProvider = authProvider;
 		this.errorsHandler = errorsHandler;
-		this.reactionsHandler = reactions;
+
+		this.reactionsHandlerConnectPromise = new Promise((res) => {
+			this.applyReactionsHandler = (handler) => {
+				this.reactionsHandler = handler;
+				res();
+			};
+		});
 	}
 
 	async loginUser<T>(data: T) {
-		return this.makePost<T, UserLoginResponse>(this.routes.userLogin, {data});
+		return this.makePost<T, UserLoginResponse>(this.routes.userLogin, { data });
 	}
 
 	async registerUser(data) {
-		return this.makePost(this.routes.userRegister, {data});
+		return this.makePost(this.routes.userRegister, { data });
 	}
 
-	async getChatDialogs<T>(options: RequestOptions<T> = { limit: 20, offset: 0 }) {
-		return this.makePost<T, ChatDialogsResponse>(this.routes.getDialogs, options);
+	async getChatDialogs<T>(
+		options: RequestOptions<T> = { limit: 20, offset: 0 }
+	) {
+		return this.makePost<T, ChatDialogsResponse>(
+			this.routes.getDialogs,
+			options
+		);
 	}
 
 	async getDialogMessages<T>(options: RequestOptions<T>) {
-		return this.makePost<T, ChatMessagesResponse>(this.routes.getDialogMessages, options);
+		return this.makePost<T, ChatMessagesResponse>(
+			this.routes.getDialogMessages,
+			options
+		);
 	}
 
 	async sendMessageToDialog<T>(options: RequestOptions<T>) {
@@ -74,30 +106,43 @@ class TransportLayer {
 		return `http://${this.serverHost}:${this.serverPort}/api/${this.apiVersion}/${route}`;
 	}
 
-	createWsConnection(namespace: WsNamespaces) {
-		const connection = new SocketsConnectionHandler<
+	async createWsConnection(namespace: WsNamespaces) {
+		return this.reactionsHandlerConnectPromise.then(() => {
+			if (!this.reactionsHandler) {
+				throw new Error('Reaction handler not initiated');
+			}
+
+			const connection = new SocketsConnectionHandler<
 				ServerToClientEvents[typeof namespace],
-        		Partial<ClientsToServerEvents[typeof namespace]>
-            >(
-            this.authProvider,
-            namespace,
-            this.reactionsHandler.byNamespace[namespace]
-        );
+				Partial<ClientsToServerEvents[typeof namespace]>
+			>(
+				this.authProvider,
+				namespace,
+				this.reactionsHandler.byNamespace[namespace]
+			);
 
-        this.wsConnections[namespace] = connection;
+			if (!this.wsConnections) {
+				this.wsConnections = {};
+			}
 
-		return connection;
+			this.wsConnections[namespace] = connection;
+
+			return connection;
+		});
 	}
 
-	async makeWSPost<T>(endpoint: WsEndpointObject, options: WsRequestOptions<T>) {
+	async makeWSPost<T>(
+		endpoint: WsEndpointObject,
+		options: WsRequestOptions<T>
+	) {
 		const data = options.data ? options.data : null;
 
-		const {namespace} = endpoint;
+		const { namespace } = endpoint;
 		const eventText = endpoint.event;
 
-		let thisConnection = this.wsConnections[namespace];
+		let thisConnection = this.wsConnections?.[namespace];
 		if (!thisConnection) {
-			thisConnection = this.createWsConnection(namespace);
+			thisConnection = await this.createWsConnection(namespace);
 		}
 
 		return thisConnection.emit({
@@ -106,29 +151,31 @@ class TransportLayer {
 		});
 	}
 
-	async makePost<T, Res>(endpoint: EndpointObject, options: RequestOptions<T>): Promise<Res> {
+	async makePost<T, Res>(
+		endpoint: EndpointObject,
+		options: RequestOptions<T>
+	): Promise<Res | UnsuccssesRequest> {
 		const data = options.data ? options.data : null;
 
 		const routeText = endpoint.url(options);
 
-		const {token} = this.authProvider;
+		const { token } = this.authProvider;
 
-        try {
-            const request: AxiosResponse<Res>  = await axios({
-                method: endpoint.method,
-                url: this.getUrl(routeText),
-                data,
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+		try {
+			const request: AxiosResponse<Res> = await axios({
+				method: endpoint.method,
+				url: this.getUrl(routeText),
+				data,
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
 
-            return request.data;
-        } catch (err: AxiosError | any) {
-            this.errorsHandler.add(err);
-
-			return err;
-        }
+			return request.data;
+		} catch (err: AxiosError | Error | unknown) {
+			this.errorsHandler.add(err);
+			return transformError(err);
+		}
 	}
 }
 

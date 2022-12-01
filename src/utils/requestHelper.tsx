@@ -1,7 +1,7 @@
-export function isSuccessRequest (req) {
-    return req?.status >= 200 && req?.status < 300;
-}
+import { UnsuccssesRequest } from 'core/TransportLayer/types';
 
-export function isUnsuccessRequest (req) {
-    return !isSuccessRequest(req);
+export function isSuccessRequest<T extends Record<string, any>>(
+	req: T | UnsuccssesRequest
+): req is T {
+	return typeof req?.error === 'undefined';
 }

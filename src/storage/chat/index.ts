@@ -1,7 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 import type TransportLayer from 'core/TransportLayer';
 import { WsNamespaces } from 'core/TransportLayer/types';
-import {makeAutoObservable, runInAction} from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 import { UserDto } from 'storage/user/types';
+import { isSuccessRequest } from 'utils/requestHelper';
 import { ChatDialog } from './types/chat-dialog';
 import { ChatDialogDto } from './types/chat-dialog.dto';
 import { ChatMessage } from './types/chat-message';
@@ -14,16 +16,16 @@ export enum ChatStates {
 }
 
 type DialogsByHash = {
-	[key: ChatDialog['uuid']]: ChatDialog
-}
+	[key: ChatDialog['uuid']]: ChatDialog;
+};
 
 type MessagesByHash = {
-	[key: ChatMessage['uuid']]: ChatMessage
-}
+	[key: ChatMessage['uuid']]: ChatMessage;
+};
 
 type DialogUsersByHash = {
-	[key: UserDto['hash']]: UserDto
-}
+	[key: UserDto['hash']]: UserDto;
+};
 
 type CurrentChatDialog = ChatDialog['uuid'] | null;
 
@@ -31,13 +33,19 @@ class Chat {
 	transportLayer: TransportLayer;
 
 	allDialogsState = ChatStates.unfetched;
+
 	dialogMessagesState = ChatStates.unfetched;
 
 	currentDialog: CurrentChatDialog = null;
+
 	dialogs: ChatDialog['uuid'][] = []; // dialogs order
+
 	dialogsByHash: DialogsByHash = {};
-	dialogsUsersData:  DialogUsersByHash = {};
-	messagesByHash:  MessagesByHash = {};
+
+	dialogsUsersData: DialogUsersByHash = {};
+
+	messagesByHash: MessagesByHash = {};
+
 	messages: ChatMessage['uuid'][] = []; // Messages order
 
 	constructor(transportLayer: TransportLayer) {
@@ -68,14 +76,14 @@ class Chat {
 
 		const response = await this.transportLayer.getChatDialogs();
 
+		if (!isSuccessRequest(response)) {
+			return;
+		}
+
 		runInAction(() => {
 			this.allDialogsState = ChatStates.fectched;
 
-			if (!response) {
-				return; //TO-DO
-			}
-
-			response.forEach(dialog => {
+			response.forEach((dialog) => {
 				this.updateDialogFromServer(dialog);
 			});
 		});
@@ -91,44 +99,49 @@ class Chat {
 			hash: uuid,
 		});
 
-		return runInAction(() => {
+		if (!isSuccessRequest(messages)) {
+			return;
+		}
+
+		runInAction(() => {
 			this.dialogMessagesState = ChatStates.fectched;
 
-			if (!messages) {
-				return;
-			}
-
-			messages.forEach(msg => {
+			messages.forEach((msg) => {
 				this.updateMessageFromServer(msg);
 			});
 
-			this.messages = this.messages.sort((hash1, hash2) => (
-				(this.messagesByHash[hash2]?.createdAt.getTime() || 0 ) - (this.messagesByHash[hash1]?.createdAt.getTime() || 0)
-			));
+			this.messages = this.messages.sort(
+				(hash1, hash2) =>
+					(this.messagesByHash[hash2]?.createdAt.getTime() || 0) -
+					(this.messagesByHash[hash1]?.createdAt.getTime() || 0)
+			);
 
 			return true;
 		});
 	}
 
 	// TO-DO
-	partialUpdateDialogFromServer(dialog: Pick<ChatDialogDto, 'uuid'> & Partial<ChatDialogDto> ) {
-		const {uuid, ...data} = dialog;
+	partialUpdateDialogFromServer(
+		dialog: Pick<ChatDialogDto, 'uuid'> & Partial<ChatDialogDto>
+	) {
+		const { uuid, ...data } = dialog;
 
 		const currentData = this.dialogsByHash[uuid];
 
 		const updateObject = {
 			...data,
 			uuid,
-			updatedAt: data.updatedAt ? new Date(data.updatedAt) : currentData.updatedAt,
-			participants: data.participants?.map(user => user.hash) || currentData.participants,
+			updatedAt: data.updatedAt
+				? new Date(data.updatedAt)
+				: currentData.updatedAt,
+			participants:
+				data.participants?.map((user) => user.hash) || currentData.participants,
 			messageUuid: dialog.__last__?.messageUuid || currentData.messageUuid,
-		}
+		};
 
-		
 		if (this.dialogsByHash[uuid]) {
-			this.dialogsByHash[uuid] = {...currentData, ...updateObject};
+			this.dialogsByHash[uuid] = { ...currentData, ...updateObject };
 		}
-		
 	}
 
 	updateDialogFromServer(dialog: ChatDialogDto) {
@@ -138,7 +151,7 @@ class Chat {
 			uuid,
 			name: dialog.name,
 			logo: '', // TO-DO
-			participants: dialog.participants.map(user => user.hash),
+			participants: dialog.participants.map((user) => user.hash),
 			updatedAt: new Date(dialog.updatedAt),
 			messageUuid: dialog.__last__?.messageUuid,
 			isTyping: Boolean(dialog.isTyping),
@@ -149,7 +162,9 @@ class Chat {
 
 			const mappedMessage = {
 				message: message.userMessage,
-				sender: dialog.participants.find(({ hash }) => hash === message.userHash),
+				sender: dialog.participants.find(
+					({ hash }) => hash === message.userHash
+				),
 				dialogUuid: message.dialogUuid,
 				uuid: message.messageUuid,
 				readed: message.messageReaded,
@@ -170,7 +185,7 @@ class Chat {
 			this.dialogs.push(uuid);
 		}
 
-		dialog.participants.forEach(user => {
+		dialog.participants.forEach((user) => {
 			this.updateChatUser(user);
 		});
 	}
@@ -185,7 +200,7 @@ class Chat {
 	}
 
 	updateMessageFromServer(message: ChatMessageDto) {
-		const {uuid, sender, ...data} = message;
+		const { uuid, sender, ...data } = message;
 
 		const messageData: ChatMessage = {
 			...data,
@@ -223,7 +238,7 @@ class Chat {
 
 	userTyping(dialogUUID: ChatDialog['uuid']) {
 		this.transportLayer.wsSendUserTyping({
-			data: {dialogUUID},
+			data: { dialogUUID },
 		});
 	}
 

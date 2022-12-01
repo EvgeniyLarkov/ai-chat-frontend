@@ -1,14 +1,8 @@
 import type AuthProvider from 'core/AuthProvider';
 import type TransportLayer from 'core/TransportLayer';
-import {
-	makeAutoObservable,
-	runInAction,
-} from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 
-import {
-	isSuccessRequest,
-	isUnsuccessRequest,
-} from '../../utils/requestHelper';
+import { isSuccessRequest } from '../../utils/requestHelper';
 import { UserDto, UserLocaleData, UserLoginData } from './types';
 
 enum UserLoginStates {
@@ -18,13 +12,18 @@ enum UserLoginStates {
 }
 
 class User {
-    authProvider: AuthProvider;
-    transportLayer: TransportLayer;
+	authProvider: AuthProvider;
+
+	transportLayer: TransportLayer;
 
 	state = UserLoginStates.unlogined;
+
 	name: UserDto['firstName'] | null = null;
+
 	email: UserDto['email'] | null = null;
+
 	id: UserDto['id'] | null = null;
+
 	hash: UserDto['hash'] | null = null;
 
 	constructor(transportLayer: TransportLayer, authProvider: AuthProvider) {
@@ -55,12 +54,12 @@ class User {
 		const response = await this.transportLayer.loginUser(data);
 
 		return runInAction(() => {
-			if (isUnsuccessRequest(response)) {
+			if (!isSuccessRequest(response)) {
 				this.state = UserLoginStates.unlogined;
 				return isSuccessRequest(response);
 			}
 
-			const {token, user} = response;
+			const { token, user } = response;
 
 			this.setUserData(user);
 
@@ -74,7 +73,7 @@ class User {
 	async register(data) {
 		const response = await this.transportLayer.registerUser(data);
 
-		return isSuccessRequest(response);
+		return response;
 	}
 
 	unlogin() {

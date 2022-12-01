@@ -1,4 +1,4 @@
-import {type UserDto} from 'storage/user/types';
+import { type UserDto } from 'storage/user/types';
 
 export type ChatMessageDto = {
 	uuid: string;

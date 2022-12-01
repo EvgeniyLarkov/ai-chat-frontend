@@ -1,19 +1,13 @@
-import {notification} from 'antd';
+import { notification } from 'antd';
+import { UnsuccssesRequest } from 'core/TransportLayer/types';
 
-type BaseError = {
-	name: string;
-	description: string;
-};
-
-const showNotifications = (errors: BaseError[]) => {
-	console.log(errors.length);
-
+const showNotifications = (errors: UnsuccssesRequest[]) => {
 	const lastMessage = errors[0];
 
 	if (lastMessage) {
 		notification.open({
-			message: lastMessage.name,
-			description: lastMessage.description,
+			message: lastMessage.message,
+			description: lastMessage.error,
 			duration: 5,
 			placement: 'topRight',
 			type: 'error',

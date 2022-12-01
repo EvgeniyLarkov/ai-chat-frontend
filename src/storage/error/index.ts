@@ -1,55 +1,18 @@
-import {makeAutoObservable} from 'mobx';
-
-import {isDevelopment} from '../../utils';
+import { UnsuccssesRequest } from 'core/TransportLayer/types';
+import { makeAutoObservable } from 'mobx';
+import { transformError } from 'utils/transformError';
 
 class ErrorStore {
-	errors = [];
+	errors: UnsuccssesRequest[] = [];
 
 	constructor() {
 		makeAutoObservable(this);
 	}
 
-	add(error) {
-		let name = '';
-		let description = '';
-		let code = null;
+	add(rawError: unknown) {
+		const error = transformError(rawError);
 
-		if (!error.response) {
-			name = 'Unknown error';
-			description = 'Something go wrong';
-		} else {
-			name = error.response.statusText;
-			description = error.response.statusText;
-			code = error.response.status;
-		}
-
-		if (error.response?.data?.errors) {
-			const allErrors = error.response.data.errors;
-			description = [];
-
-			for (const errorKey in allErrors) {
-				const errorText = `${errorKey}: ${allErrors[errorKey]}`;
-				description = [...description, errorText];
-			}
-
-			description.join(', ');
-		}
-
-		const normalizedError = {
-			name,
-			description,
-			code,
-		};
-
-		if (isDevelopment()) {
-			console.log(error, normalizedError);
-		}
-
-		this.errors = [{
-			name,
-			description,
-			code,
-		}, ...this.errors];
+		this.errors = [error, ...this.errors];
 	}
 }
 

@@ -2,6 +2,8 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const ReactRefreshTypeScript = require('react-refresh-typescript');
 
 let mode = 'development';
 let target = 'web';
@@ -11,6 +13,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const isProduction = mode === 'production';
+const isDevelopment = mode === 'development';
 
 const plugins = [
   new MiniCssExtractPlugin({
@@ -18,10 +21,10 @@ const plugins = [
   }),
   new HtmlWebpackPlugin({
     template: './public/index.html',
-  }),
+  })
 ];
 
-if (process.env.SERVE) {
+if (isDevelopment) {
   plugins.push(new ReactRefreshWebpackPlugin());
 }
 
@@ -29,38 +32,43 @@ module.exports = {
   mode,
   target,
   plugins,
+  context: __dirname,
   devtool: 'source-map',
   entry: './src/index.tsx',
   devServer: {
     static: './dist',
-    hot: true,
   },
-
   output: {
     path: path.resolve(__dirname, 'dist'),
     assetModuleFilename: 'assets/[hash][ext][query]',
     clean: true,
   },
   resolve: {
-    extensions: ['.js', '.ts', '.tsx'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
     mainFields: ['module', 'browser', 'main'],
-    alias: {
-      app: path.resolve(__dirname, 'src/'),
-      'react-dom': '@hot-loader/react-dom',
-    },
+    plugins: [new TsconfigPathsPlugin({/* options: see below */ })]
+    // alias: {
+    //   app: path.resolve(__dirname, 'src/'),
+    //   'react-dom': '@hot-loader/react-dom',
+    // },
   },
   module: {
     rules: [
       { test: /\.(html)$/, use: ['html-loader'] },
       {
-        test: /\.tsx?$/,
+        test: /\.[jt]sx?$/,
+        exclude: /node_modules/,
         use: [
-          !isProduction && {
-            loader: 'babel-loader',
-            options: { plugins: ['react-hot-loader/babel'] },
-          },
-          'ts-loader',
-        ].filter(Boolean),
+          {
+            loader: require.resolve('ts-loader'),
+            options: {
+              getCustomTransformers: () => ({
+                before: [isDevelopment && ReactRefreshTypeScript()].filter(Boolean),
+              }),
+              transpileOnly: isDevelopment,
+            },
+          }
+        ]
       },
       {
         test: /\.(s[ac]|c)ss$/i,
@@ -78,16 +86,6 @@ module.exports = {
       {
         test: /\.(woff2?|eot|ttf|otf)$/i,
         type: 'asset/resource',
-      },
-      {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: true,
-          },
-        },
       },
     ],
   },
