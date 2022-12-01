@@ -10,6 +10,8 @@ if (process.env.NODE_ENV === 'production') {
   target = 'browserslist';
 }
 
+const isProduction = mode === 'production';
+
 const plugins = [
   new MiniCssExtractPlugin({
     filename: '[name].[contenthash].css',
@@ -28,7 +30,7 @@ module.exports = {
   target,
   plugins,
   devtool: 'source-map',
-  entry: './src/index.js',
+  entry: './src/index.tsx',
   devServer: {
     static: './dist',
     hot: true,
@@ -39,10 +41,27 @@ module.exports = {
     assetModuleFilename: 'assets/[hash][ext][query]',
     clean: true,
   },
-
+  resolve: {
+    extensions: ['.js', '.ts', '.tsx'],
+    mainFields: ['module', 'browser', 'main'],
+    alias: {
+      app: path.resolve(__dirname, 'src/'),
+      'react-dom': '@hot-loader/react-dom',
+    },
+  },
   module: {
     rules: [
       { test: /\.(html)$/, use: ['html-loader'] },
+      {
+        test: /\.tsx?$/,
+        use: [
+          !isProduction && {
+            loader: 'babel-loader',
+            options: { plugins: ['react-hot-loader/babel'] },
+          },
+          'ts-loader',
+        ].filter(Boolean),
+      },
       {
         test: /\.(s[ac]|c)ss$/i,
         use: [
