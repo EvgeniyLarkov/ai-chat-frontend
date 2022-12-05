@@ -17,7 +17,7 @@ class RootStorage {
 
 	chat: Chat;
 
-	userStorage: User;
+	user: User;
 
 	UiStorage: UI;
 
@@ -34,7 +34,7 @@ class RootStorage {
 		);
 
 		this.chat = new Chat(this.transportLayer);
-		this.userStorage = new User(this.transportLayer, this.authProvider);
+		this.user = new User(this.transportLayer, this.authProvider);
 		this.UiStorage = new UI();
 		this.chatUi = new ChatUiState();
 

@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import type TransportLayer from 'core/TransportLayer';
 import { WsNamespaces } from 'core/TransportLayer/types';
-import { makeAutoObservable, runInAction } from 'mobx';
+import { makeAutoObservable, runInAction, toJS } from 'mobx';
 import { UserDto } from 'storage/user/types';
 import { isSuccessRequest } from 'utils/requestHelper';
 import { ChatDialog } from './types/chat-dialog';
@@ -93,15 +93,17 @@ class Chat {
 		// TO-DO
 		this.dialogMessagesState = ChatStates.pending;
 
-		const messages = await this.transportLayer.getDialogMessages({
+		const response = await this.transportLayer.getDialogMessages({
 			limit,
 			offset,
 			hash: uuid,
 		});
 
-		if (!isSuccessRequest(messages)) {
+		if (!isSuccessRequest(response)) {
 			return;
 		}
+
+		const messages = response.data;
 
 		runInAction(() => {
 			this.dialogMessagesState = ChatStates.fectched;
@@ -191,12 +193,10 @@ class Chat {
 	}
 
 	updateChatUser(user: Pick<UserDto, 'hash'> & Partial<UserDto>) {
-		if (this.dialogsUsersData[user.hash]) {
-			this.dialogsUsersData[user.hash] = {
-				...this.dialogsUsersData[user.hash],
-				...user,
-			};
-		}
+		this.dialogsUsersData[user.hash] = {
+			...this.dialogsUsersData[user.hash],
+			...user,
+		};
 	}
 
 	updateMessageFromServer(message: ChatMessageDto) {

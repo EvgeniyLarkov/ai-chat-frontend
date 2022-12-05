@@ -2,7 +2,8 @@ const translation = {
 	translation: {
 		header: {
 			login: 'Войти',
-			greeting: 'Привет, {{username}}',
+			greeting: 'Здравствуйте,',
+			back: 'Назад',
 		},
 		login: {
 			label: 'Войти',
@@ -14,7 +15,10 @@ const translation = {
 			login: 'Войти',
 			errors: {
 				'email-empty': 'Укажите e-mail!',
+				'email-incorrect': 'Неверный e-mail!',
 				'password-empty': 'Введите пароль',
+				'incorrect-credentials': 'Нет пользователя с e-mail',
+				'incorrect-password': 'Неверный пароль',
 			},
 		},
 		register: {

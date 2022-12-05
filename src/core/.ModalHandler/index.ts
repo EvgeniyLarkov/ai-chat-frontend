@@ -13,8 +13,8 @@ const ModalHandler =  observer(({ storage }) => {
 
     return (
         <>
-            {ui.currentModal === availableModals.login ? <LoginModal user={storage.userStorage} ui={ui} /> : ''}
-            {ui.currentModal === availableModals.register ? <RegisterModal user={storage.userStorage} ui={ui} />  : ''}
+            {ui.currentModal === availableModals.login ? <LoginModal user={storage.user} ui={ui} /> : ''}
+            {ui.currentModal === availableModals.register ? <RegisterModal user={storage.user} ui={ui} />  : ''}
             {ui.currentModal === availableModals.registerConfirmation ? <RegisterConfirmationModal ui={ui} />  : ''}
         </>
     );

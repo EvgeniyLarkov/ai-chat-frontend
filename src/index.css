@@ -1,13 +1,77 @@
+:root {
+  --primary-light: #8abdff;
+  --primary: #6d5dfc;
+  --primary-dark: #5b0eeb;
+  --white: #FFFFFF;
+  --greyLight-1: #E4EBF5;
+  --greyLight-2: #c8d0e7;
+  --greyLight-3: #bec8e4;
+  --greyDark: #9baacf;
+  --warning: #f40e0e;
+
+  --containerShadow: 0.8rem 0.8rem 1.4rem var(--greyLight-2), -0.2rem -0.2rem 1.8rem var(--white);
+  --elementShadow: 0.3rem 0.3rem 0.6rem var(--greyLight-2), -0.2rem -0.2rem 0.5rem var(--white);
+
+  --textColor: var(--greyDark);
+  --textColorPrimary: var(--primary-dark);
+  --textColorOnPrimary: var(--white);
+  --textColorOnWarning: var(--warning);
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+html {
+  box-sizing: border-box;
+  font-size: 62.5%;
+
+  font-family: "Poppins", sans-serif;
+}
+
+@media screen and (min-width: 900px) {
+  html {
+    font-size: 75%;
+  }
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.typography {
+  font-size: 100%;
+  color: var(--textColor);
+}
+
+.typography.sublabel {
+  font-size: 1.4rem;
+}
+
+.container {
+  border-radius: 2rem;
+  box-shadow: 0.8rem 0.8rem 1.4rem var(--greyLight-2), -0.2rem -0.2rem 1.8rem var(--white);
+
+  background: var(--greyLight-1);
+}
+
+.divider {
+  margin: 2rem 0;
+  height: 1px;
+  background-color: var(--greyLight-2);
+  width: 100%;
+}
+
+.divider.small {
+  margin: 1rem 0;
 }

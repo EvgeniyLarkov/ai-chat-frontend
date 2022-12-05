@@ -1,0 +1,21 @@
+.notification {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.notification.visible {
+    opacity: 1;
+}
+
+.notification-inner {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+
+    width: 100%;
+}
+
+.notification-text,
+.notification-label {
+    padding: 0 2rem;
+}

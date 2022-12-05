@@ -1,9 +1,11 @@
+/* eslint-disable prettier/prettier */
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const ReactRefreshTypeScript = require('react-refresh-typescript');
+const postcssPresetEnv = require('postcss-preset-env');
 
 let mode = 'development';
 let target = 'web';
@@ -16,12 +18,12 @@ const isProduction = mode === 'production';
 const isDevelopment = mode === 'development';
 
 const plugins = [
-  new MiniCssExtractPlugin({
-    filename: '[name].[contenthash].css',
-  }),
+  // new MiniCssExtractPlugin({
+  //   filename: '[name].[contenthash].css',
+  // }),
   new HtmlWebpackPlugin({
     template: './public/index.html',
-  })
+  }),
 ];
 
 if (isDevelopment) {
@@ -46,7 +48,11 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     mainFields: ['module', 'browser', 'main'],
-    plugins: [new TsconfigPathsPlugin({/* options: see below */ })]
+    plugins: [
+      new TsconfigPathsPlugin({
+        /* options: see below */
+      }),
+    ],
     // alias: {
     //   app: path.resolve(__dirname, 'src/'),
     //   'react-dom': '@hot-loader/react-dom',
@@ -63,20 +69,28 @@ module.exports = {
             loader: require.resolve('ts-loader'),
             options: {
               getCustomTransformers: () => ({
-                before: [isDevelopment && ReactRefreshTypeScript()].filter(Boolean),
+                before: [isDevelopment && ReactRefreshTypeScript()].filter(
+                  Boolean
+                ),
               }),
               transpileOnly: isDevelopment,
             },
-          }
-        ]
+          },
+        ],
       },
       {
-        test: /\.(s[ac]|c)ss$/i,
+        test: /\.css$/i,
         use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
-          'postcss-loader',
-          'sass-loader',
+          "style-loader",
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1,
+            },
+          },
+          {
+            loader: "postcss-loader",
+          },
         ],
       },
       {

@@ -5,7 +5,7 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import { isSuccessRequest } from '../../utils/requestHelper';
 import { UserDto, UserLocaleData, UserLoginData } from './types';
 
-enum UserLoginStates {
+export enum UserLoginStates {
 	logined = 'logined',
 	unlogined = 'unlogined',
 	pending = 'pending',
@@ -53,10 +53,10 @@ class User {
 		this.state = UserLoginStates.pending;
 		const response = await this.transportLayer.loginUser(data);
 
-		return runInAction(() => {
+		runInAction(() => {
 			if (!isSuccessRequest(response)) {
 				this.state = UserLoginStates.unlogined;
-				return isSuccessRequest(response);
+				return response;
 			}
 
 			const { token, user } = response;
@@ -68,6 +68,8 @@ class User {
 
 			return isSuccessRequest(response);
 		});
+
+		return response;
 	}
 
 	async register(data) {
@@ -76,7 +78,7 @@ class User {
 		return response;
 	}
 
-	unlogin() {
+	logout() {
 		this.state = UserLoginStates.unlogined;
 		this.name = null;
 		this.id = null;

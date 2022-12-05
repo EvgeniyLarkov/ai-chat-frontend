@@ -8,7 +8,7 @@ import { useStore } from '../../../storage';
 import useThrottle from '../../../hooks/useThrottle';
 
 const ChatWindowComponent = observer(() => {
-	const { chat, chatUi, userStorage } = useStore();
+	const { chat, chatUi, user } = useStore();
 
 	const [value, setValue] = useState('');
 
@@ -19,7 +19,7 @@ const ChatWindowComponent = observer(() => {
 
 	const chatWindowRef = useRef<HTMLDivElement>(null);
 
-	const userHash = userStorage.hash;
+	const userHash = user.hash;
 	const chatMessages = chat.messages;
 	const chatDialog = chat.currentDialog as string;
 

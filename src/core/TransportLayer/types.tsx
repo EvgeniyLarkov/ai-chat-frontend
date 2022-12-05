@@ -81,5 +81,13 @@ export interface IStockError<T> extends IErrorBase<T> {
 export type UnsuccssesRequest = {
 	error: IErrorTypes;
 	message: string;
-	data?: unknown;
+	data?: {
+		errors?: Record<string, string>;
+		status: number;
+	};
+};
+
+export type ResponseWithPagination<T> = {
+	data: T;
+	hasNextPage: boolean;
 };

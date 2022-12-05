@@ -1,0 +1,12 @@
+.field-input {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.field-error {
+    font-size: 1rem;
+    color: var(--textColorOnWarning);
+
+    width: 100%;
+}

@@ -44,6 +44,12 @@
                 "tsx": "never"
             }
         ],
+        "react/jsx-props-no-spreading": [
+            "error",
+            {
+                "html": "ignore"
+            }
+        ],
         "no-shadow": "off",
         "react/require-default-props": "off",
         "@typescript-eslint/no-shadow": [
