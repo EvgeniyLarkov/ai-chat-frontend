@@ -39,10 +39,13 @@ module.exports = {
   entry: './src/index.tsx',
   devServer: {
     static: './dist',
+    port: 8085,
+    historyApiFallback: true,
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
     assetModuleFilename: 'assets/[hash][ext][query]',
+    publicPath: '/',
     clean: true,
   },
   resolve: {

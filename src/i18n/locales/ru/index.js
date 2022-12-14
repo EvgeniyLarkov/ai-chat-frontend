@@ -1,9 +1,17 @@
+import chat from './chat.js';
+import profile from './profile.js';
+
 const translation = {
 	translation: {
 		header: {
 			login: 'Войти',
+			register: 'Регистрация',
 			greeting: 'Здравствуйте,',
 			back: 'Назад',
+		},
+		navigation: {
+			chat: 'Диалоги',
+			profile: 'Профиль',
 		},
 		login: {
 			label: 'Войти',
@@ -41,6 +49,8 @@ const translation = {
 				'secondName-empty': 'Введите Вашу фамилию',
 			},
 		},
+		chat,
+		profile,
 	},
 };
 

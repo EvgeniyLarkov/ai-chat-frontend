@@ -11,6 +11,7 @@
 
   --containerShadow: 0.8rem 0.8rem 1.4rem var(--greyLight-2), -0.2rem -0.2rem 1.8rem var(--white);
   --elementShadow: 0.3rem 0.3rem 0.6rem var(--greyLight-2), -0.2rem -0.2rem 0.5rem var(--white);
+  --insetShadow: inset 0.2rem 0.2rem 0.5rem var(--greyLight-2), inset -0.2rem -0.2rem 0.5rem var(--white);
 
   --textColor: var(--greyDark);
   --textColorPrimary: var(--primary-dark);
@@ -54,6 +55,10 @@ body {
   color: var(--textColor);
 }
 
+.typography.label {
+  font-size: 1.6rem;
+}
+
 .typography.sublabel {
   font-size: 1.4rem;
 }
@@ -74,4 +79,42 @@ body {
 
 .divider.small {
   margin: 1rem 0;
+}
+
+.divider.base {
+  margin: 0;
+}
+
+.with-scrollbar {
+  margin-right: 0.5rem;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+.with-scrollbar::-webkit-scrollbar {
+  width: 1.2rem;
+}
+
+/* Track */
+.with-scrollbar::-webkit-scrollbar-track {
+  width: 1.2rem;
+  box-shadow: var(--insetShadow);
+  background: var(--greyLight-1);
+  border-radius: 0.6rem;
+}
+
+/* Handle */
+.with-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--greyDark);
+  border-radius: 1.2rem;
+
+  border: 0.2rem solid transparent;
+  background-clip: content-box;
+}
+
+/* Handle on hover */
+.with-scrollbar::-webkit-scrollbar-thumb:hover {
+  border-right: 0.2rem solid rgba(0, 0, 0, 0);
+  border-left: 0.2rem solid rgba(0, 0, 0, 0);
+  background-clip: padding-box;
 }

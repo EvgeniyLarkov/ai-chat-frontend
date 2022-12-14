@@ -40,15 +40,13 @@ class ChatReactions {
 	handleIsOnlineReaction(data: {
 		onlineUsers?: { hash: UserDto['hash']; isOnline: boolean }[];
 	}) {
-		runInAction(() => {
-			if (!data.onlineUsers) {
-				return;
-			}
+		const { onlineUsers } = data;
 
-			data.onlineUsers.forEach((user) => {
+		if (Array.isArray(onlineUsers)) {
+			onlineUsers.forEach((user) => {
 				this.chatStorage.updateChatUser(user);
 			});
-		});
+		}
 	}
 
 	handleTypingReaction(data: {

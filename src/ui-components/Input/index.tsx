@@ -4,6 +4,7 @@ import './index.css';
 export type InputInterface = {
 	value?: string | number;
 	disabled?: boolean;
+	fullWidth?: boolean;
 	onClick?: (event: React.UIEvent<HTMLInputElement>) => void;
 	onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
 	onInput?: (event: React.UIEvent<HTMLInputElement>) => void;
@@ -14,6 +15,7 @@ export type InputInterface = {
 
 function Input({
 	value,
+	fullWidth = false,
 	disabled = false,
 	onClick,
 	onChange,
@@ -28,7 +30,7 @@ function Input({
 
 	return (
 		<input
-			className="input"
+			className={`input${fullWidth ? ' full-width' : ''}`}
 			value={typeof value !== 'undefined' ? value : ''}
 			disabled={disabled}
 			{...InputProps}

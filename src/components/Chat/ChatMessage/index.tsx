@@ -16,7 +16,7 @@ function ChatMessageComponent({
 		<div
 			className={`chat-message-wrapper ${isSelfMessage ? 'self-message' : ''}`}
 		>
-			<div className="chat-message">{message}</div>
+			<div className="chat-message typography">{message}</div>
 		</div>
 	);
 }

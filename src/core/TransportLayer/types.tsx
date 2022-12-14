@@ -51,6 +51,10 @@ export type RequestOptions<T> = RequestData<T> & EndpointParameters;
 export type WsRequestOptions<T> = RequestData<T>;
 export type WsEmitRequestOptions<T> = RequestData<T> &
 	Pick<WsEndpointObject, 'event'>;
+export type RequestFileOptions<T> = {
+	file: string | Blob;
+	data?: T;
+} & EndpointParameters;
 
 interface IErrorBase<T> {
 	error: Error | AxiosError<T>;

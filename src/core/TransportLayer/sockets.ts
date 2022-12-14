@@ -3,6 +3,7 @@ import { makeAutoObservable, toJS } from 'mobx';
 import { io, Socket } from 'socket.io-client';
 import { EventNames } from '@socket.io/component-emitter';
 import { EventsMap } from 'socket.io/dist/typed-events';
+import Reactions from 'storage/reactions';
 import { serverHost, serverPort } from './config';
 import { WsEmitRequestOptions, WsNamespaces } from './types';
 
@@ -22,9 +23,9 @@ class SocketsConnectionHandler<
 
 	authProvider: AuthProvider;
 
-	namespace: WsNamespaces;
+	reactionsHandler: Reactions;
 
-	reactions: ServerToClients;
+	namespace: WsNamespaces;
 
 	state = ConnectionStates.unconnected;
 
@@ -35,13 +36,13 @@ class SocketsConnectionHandler<
 	constructor(
 		authProvider: AuthProvider,
 		namespace: WsNamespaces,
-		reactions: ServerToClients
+		reactionHandler: Reactions
 	) {
 		makeAutoObservable(this);
 
 		this.authProvider = authProvider;
 		this.namespace = namespace;
-		this.reactions = reactions;
+		this.reactionsHandler = reactionHandler;
 
 		const connection: Socket<ServerToClients, ClientsToServer> = io(
 			`http://${this.serverHost}:${this.serverPort}/${namespace}`,
@@ -69,11 +70,12 @@ class SocketsConnectionHandler<
 			});
 		});
 
-		const eventNames = Object.getOwnPropertyNames(this.reactions);
+		// const reactions = this.reactionsHandler.byNamespace[namespace];
+		// const eventNames = Object.getOwnPropertyNames(reactions);
 
-		eventNames.forEach((eventName) => {
-			this.addReaction(eventName, reactions[eventName]);
-		});
+		// eventNames.forEach((eventName) => {
+		// 	this.addReaction(eventName, reactions[eventName]);
+		// });
 	}
 
 	handleConnection() {
@@ -81,15 +83,19 @@ class SocketsConnectionHandler<
 
 		console.log('connected to namespasce: ', this.namespace);
 
+		const reactions = this.reactionsHandler.byNamespace[
+			this.namespace
+		] as unknown as ServerToClients;
 		const eventNames = Object.getOwnPropertyNames(
-			this.reactions
+			reactions
 		) as unknown as Array<keyof ServerToClients>;
 
 		eventNames.forEach((eventName) => {
-			const reaction = this.reactions[eventName] as (data: any) => void;
+			const reaction = reactions[eventName];
 
 			this.io.on(eventName as unknown as any, (data) => {
-				reaction(data);
+				const bindedReaction = reaction.bind(this.reactionsHandler);
+				bindedReaction(data);
 			});
 		});
 	}
@@ -100,28 +106,37 @@ class SocketsConnectionHandler<
 		console.log('disconnected from namespasce: ', this.namespace);
 	}
 
-	addReaction(
-		eventName: keyof ServerToClients,
-		reaction: ServerToClients[typeof eventName]
-	) {
-		console.log(
-			`applied reaction on ${String(eventName)} in namespace ${this.namespace}`
-		);
-		this.reactions[eventName] = reaction;
-	}
+	// addReaction(
+	// 	eventName: keyof ServerToClients,
+	// 	reaction: ServerToClients[typeof eventName]
+	// ) {
+	// 	console.log(
+	// 		`applied reaction on ${String(eventName)} in namespace ${this.namespace}`
+	// 	);
+	// 	this.reactions[eventName] = reaction;
+	// }
 
 	emit<T>(options: WsEmitRequestOptions<T>) {
 		this.connectionPromise
 			.then(() => {
 				const { event, data } = options;
 
-				console.log('emit to namespasce: ', this.namespace, ' event: ', event);
+				console.log(
+					'emit to namespasce: ',
+					this.namespace,
+					' event: ',
+					event,
+					'data:',
+					data
+				);
 
 				const thisIo = this.io;
 
 				return thisIo.emit(
 					event as unknown as EventNames<ClientsToServer>,
-					...({ data } as unknown as any)
+					...([data] as unknown as Parameters<
+						ClientsToServer[EventNames<ClientsToServer>]
+					>) // TO-DO
 				);
 			})
 			.catch(() => {

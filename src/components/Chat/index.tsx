@@ -1,15 +1,32 @@
 import './index.css';
 
+import { Outlet, useParams } from 'react-router-dom';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { ChatStates } from '../../storage/chat';
 import DialogCard from './DialogCard';
-import ChatWindowComponent from './ChatWindow';
 import { useStore } from '../../storage';
 
 const ChatComponent = observer(() => {
+	const { dialogUuid } = useParams();
+	const data = useParams();
 	const { chat, chatUi, user } = useStore();
+
+	const dialogSelectHandler = (uuid: string | undefined) => {
+		if (
+			uuid &&
+			chat.currentDialog !== uuid &&
+			chat.allDialogsState !== ChatStates.pending
+		) {
+			runInAction(() => {
+				chat.changeCurrentDialog(uuid);
+				chatUi.setChatInBottom(true);
+			});
+		} else {
+			chat.changeCurrentDialog(null);
+		}
+	};
 
 	useEffect(() => {
 		if (chat.allDialogsState === ChatStates.unfetched) {
@@ -19,17 +36,9 @@ const ChatComponent = observer(() => {
 		}
 	}, [chat, chat.allDialogsState]);
 
-	const dialogSelectHandler = (dialogUuid: string) => () => {
-		if (
-			chat.currentDialog !== dialogUuid &&
-			chat.allDialogsState !== ChatStates.pending
-		) {
-			runInAction(() => {
-				chat.changeCurrentDialog(dialogUuid);
-				chatUi.setChatInBottom(true);
-			});
-		}
-	};
+	useEffect(() => {
+		dialogSelectHandler(dialogUuid);
+	}, [dialogUuid]);
 
 	return (
 		<div className="chat-outer">
@@ -60,24 +69,25 @@ const ChatComponent = observer(() => {
 
 								const { firstName, lastName, photo, isOnline } = opponent;
 								return (
-									<div onClick={dialogSelectHandler(uuid)} key={uuid}>
-										<DialogCard
-											key={`${uuid}_chat`}
-											message={message || ''}
-											readed={readed || true}
-											isOnline={isOnline || false}
-											isTyping={isTyping || false}
-											name={`${firstName} ${lastName}`}
-											logo={photo}
-										/>
-									</div>
+									<DialogCard
+										key={`${uuid}_chat`}
+										dialogUuid={uuid}
+										message={message || ''}
+										readed={readed || true}
+										isOnline={isOnline || false}
+										isTyping={isTyping || false}
+										selected={dialogUuid === uuid}
+										firstname={firstName}
+										lastname={lastName}
+										logo={photo}
+									/>
 								);
 							})}
 						</div>
 					</div>
-					<div className="divider" />
+					<div className="divider base" />
 					<div className="chat-messages-container">
-						{chat.currentDialog && <ChatWindowComponent />}
+						<Outlet />
 					</div>
 				</div>
 			</div>

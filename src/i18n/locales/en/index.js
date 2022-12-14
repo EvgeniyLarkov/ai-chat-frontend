@@ -1,8 +1,14 @@
+import chat from './chat.js';
+
 const translation = {
 	translation: {
 		header: {
 			login: 'Log in',
-			greeting: 'Welcome {{username}}',
+			greeting: 'Welcome',
+			back: 'Back',
+		},
+		navigation: {
+			chat: 'Dialogs',
 		},
 		login: {
 			label: 'Log in',
@@ -15,6 +21,9 @@ const translation = {
 			errors: {
 				'email-empty': 'Please input your e-mail!',
 				'password-empty': 'Please input your password!',
+				'email-incorrect': 'Incorrect e-mail!',
+				'incorrect-credentials': 'User with this e-mail is not exist',
+				'incorrect-password': 'Incorrect password',
 			},
 		},
 		register: {
@@ -38,6 +47,7 @@ const translation = {
 				'secondName-empty': 'Please input your second name!',
 			},
 		},
+		chat,
 	},
 };
 

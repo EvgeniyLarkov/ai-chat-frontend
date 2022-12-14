@@ -1,0 +1,140 @@
+.dialog-card {
+    padding: 1rem 2rem;
+    padding-top: 1.5rem;
+    border-radius: 2rem;
+}
+
+.dialog-card.selected {
+    box-shadow: var(--insetShadow);
+}
+
+.dialog-card_inner {
+    --avatar-size: 5rem;
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 1rem;
+}
+
+.dialog-card_avatar_wrapper {
+    position: relative;
+}
+
+.dialog-card_avatar {
+    position: relative;
+    display: flex;
+
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+
+    border-radius: 50%;
+
+    border: 0.3rem solid var(--greyLight-1);
+    box-shadow: var(--elementShadow);
+    background: linear-gradient(0deg, var(--primary-light), var(--primary-dark));
+
+    overflow: hidden;
+    z-index: 1;
+}
+
+.dialog-card_avatar-image {
+    flex: 1;
+
+    object-position: center;
+    object-fit: cover;
+}
+
+.dialog-card_avatar-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--textColor);
+    font-size: 2rem;
+
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+
+    user-select: none;
+}
+
+.dialog-card_avatar-hint {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: var(--white);
+    font-size: 1.6rem;
+}
+
+.dialog-card_username {
+    font-size: 1.3rem;
+}
+
+.dialog-card_avatar-image,
+.dialog-card_avatar-hint {
+    transition: filter 0.3s ease-in;
+}
+
+.dialog-card.typing .dialog-card_avatar-image,
+.dialog-card.typing .dialog-card_avatar-hint {
+    filter: blur(10px);
+}
+
+.dialog-card.typing .dialog-card_avatar-overlay {
+    opacity: 1;
+}
+
+
+.dialog-card.online .dialog-card_avatar_circle-1 {
+    box-shadow: 0.2rem 0.2rem 0.4rem var(--greenLight-1), -0.4rem -0.4rem 0.8rem var(--white);
+    background: linear-gradient(to bottom right, var(--greenLight-1) 0%, var(--white) 100%);
+    -webkit-animation: waves 3s linear infinite;
+    animation: waves 3s linear infinite;
+
+    filter: blur(1px);
+}
+
+.dialog-card_avatar_circle-1 {
+    --greenLight-1: #4aff50;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    border-radius: 50%;
+
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+}
+
+@keyframes waves {
+    0% {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}

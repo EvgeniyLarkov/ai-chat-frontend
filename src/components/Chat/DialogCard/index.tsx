@@ -1,12 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Icon } from 'ui-components/Icon';
 
-import { Avatar, Badge, Card } from 'antd';
-import Meta from 'antd/lib/card/Meta';
+import './index.css';
 
 type DialogCardInterface = {
 	message: string;
+	dialogUuid: string;
 	readed: boolean;
-	name: string;
+	firstname: string;
+	lastname: string;
 	logo?: string;
 	selected?: boolean;
 	isOnline: boolean;
@@ -14,62 +17,57 @@ type DialogCardInterface = {
 };
 
 function DialogCard({
+	dialogUuid,
 	message,
 	readed,
-	name,
+	firstname,
+	lastname,
 	logo = '',
 	selected = false,
 	isOnline,
 	isTyping,
 }: DialogCardInterface) {
-	const typingTimerRef = useRef<{ dots: number; timerId: null | NodeJS.Timer }>(
-		{ dots: 0, timerId: null }
-	);
-	const [currentMessage, setCurrentMessage] = useState(message);
+	const [hasLogo, setHasLogo] = useState(logo.length > 0);
 
-	const UserAvatar = <Avatar>{name}</Avatar>;
+	const handleLogoError = () => {
+		setHasLogo(false);
+	};
 
-	useEffect(() => {
-		const { timerId } = typingTimerRef.current;
+	const cardStyles = [
+		...(isTyping ? ['typing'] : []),
+		...(isOnline ? ['online'] : []),
+		...(selected ? ['selected'] : []),
+	].join(' ');
 
-		if (!isTyping && timerId) {
-			clearInterval(timerId);
-			setCurrentMessage(message);
-			return;
-		}
-
-		typingTimerRef.current.timerId = setInterval(() => {
-			let { dots } = typingTimerRef.current;
-
-			if (dots > 3) {
-				dots = 0;
-			} else {
-				dots += 1;
-			}
-
-			const messageText = `User typing${'.'.repeat(dots)}`;
-			typingTimerRef.current.dots = dots;
-
-			setCurrentMessage(messageText);
-		}, 750);
-	}, [message, isTyping]);
+	const nameHint = `${firstname[0].toUpperCase()}${lastname[0].toUpperCase()}`;
 
 	return (
-		<Card
-			style={{
-				width: 250,
-			}}
-		>
-			<Meta
-				avatar={
-					<Badge dot status={isOnline ? 'success' : 'error'}>
-						{UserAvatar}
-					</Badge>
-				}
-				title={name}
-				description={currentMessage}
-			/>
-		</Card>
+		<div className={`dialog-card ${cardStyles}`}>
+			<div className="dialog-card_inner">
+				<Link className="dialog-card_avatar_wrapper" to={dialogUuid}>
+					<div className="dialog-card_avatar">
+						{!hasLogo && (
+							<div className="dialog-card_avatar-hint typography">
+								{nameHint}
+							</div>
+						)}
+						<div className="dialog-card_avatar-overlay">
+							<Icon.Typing />
+						</div>
+						{hasLogo && (
+							<img
+								src={logo}
+								onError={handleLogoError}
+								className="dialog-card_avatar-image"
+								alt={`${firstname} ${lastname} logo`}
+							/>
+						)}
+					</div>
+					<div className="dialog-card_avatar_circle-1" />
+				</Link>
+				<div className="dialog-card_username typography">{firstname}</div>
+			</div>
+		</div>
 	);
 }
 

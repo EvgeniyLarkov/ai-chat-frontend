@@ -2,7 +2,7 @@
     --sidepanel-width-base: 25rem;
     --notification-width-base: 20rem;
 
-    min-height: 100vh;
+    height: 100vh;
     width: 100vw;
 
     display: flex;
@@ -13,6 +13,7 @@
 .base-layout-inner {
     position: relative;
 
+    display: flex;
     flex: 1;
 }
 
@@ -27,5 +28,6 @@
 }
 
 .base-layout-content {
-    height: 100%;
+    display: flex;
+    flex: 1;
 }

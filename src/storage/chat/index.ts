@@ -58,7 +58,7 @@ class Chat {
 		this.startGetOnlineDialogs();
 	}
 
-	changeCurrentDialog(uuid: ChatDialog['uuid']) {
+	changeCurrentDialog(uuid: ChatDialog['uuid'] | null) {
 		this.currentDialog = uuid;
 		this.dialogMessagesState = ChatStates.unfetched;
 

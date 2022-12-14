@@ -9,7 +9,10 @@ import IconButton from 'ui-components/IconButton';
 import { Icon } from 'ui-components/Icon';
 
 import { observer } from 'mobx-react-lite';
+import { UserLoginData } from 'storage/user/types';
 import LoginBox from './Login';
+import { SideNavigation } from './Navigation';
+import RegisterBox from './Register';
 
 enum SidePanelForms {
 	'register' = 'register',
@@ -40,9 +43,19 @@ const SidePanel = observer(() => {
 	const handleOpenLogin = () => {
 		setSearchParams({ form: SidePanelForms.login });
 	};
+
+	const handleOpenRegister = () => {
+		setSearchParams({ form: SidePanelForms.register });
+	};
+
 	const handleOpenDefault = () => {
 		searchParams.delete('form');
 		setSearchParams(searchParams);
+	};
+
+	const handleSuccessRegister = (data: UserLoginData) => {
+		handleOpenDefault();
+		user.login(data);
 	};
 
 	const handleLogout = () => {
@@ -77,6 +90,7 @@ const SidePanel = observer(() => {
 							</div>
 						)}
 						<div className="divider" />
+						<SideNavigation />
 					</div>
 				)}
 				{form === SidePanelForms.login && (
@@ -88,6 +102,21 @@ const SidePanel = observer(() => {
 							<div className="divider" />
 						</div>
 						<LoginBox successCallback={handleOpenDefault} />
+						<div className="divider base" />
+						<Button fullWidth onClick={handleOpenRegister}>
+							{t('header.register')}
+						</Button>
+					</>
+				)}
+				{form === SidePanelForms.register && (
+					<>
+						<div className="sidepanel_header">
+							<Button fullWidth onClick={handleOpenDefault}>
+								{t('header.back')}
+							</Button>
+							<div className="divider" />
+						</div>
+						<RegisterBox successCallback={handleSuccessRegister} />
 					</>
 				)}
 			</div>

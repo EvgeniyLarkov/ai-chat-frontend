@@ -6,12 +6,18 @@ import Reactions, { ServerToClientEvents } from 'storage/reactions';
 import { transformError } from 'utils/transformError';
 import { apiVersion, serverHost, serverPort } from './config';
 import { ChatDialogsResponse, ChatMessagesResponse } from './dto/chat';
-import { UserLoginResponse } from './dto/user';
+import {
+	UserLoginResponse,
+	UserRegisterResponse,
+	UserUpdateInfoResponse,
+	UserUploadFileResponse,
+} from './dto/user';
 import endpoints, { wsEndpoints } from './routes';
 import SocketsConnectionHandler from './sockets';
 import {
 	ClientsToServerEvents,
 	EndpointObject,
+	RequestFileOptions,
 	RequestOptions,
 	UnsuccssesRequest,
 	WsEndpointObject,
@@ -66,8 +72,10 @@ class TransportLayer {
 		return this.makePost<T, UserLoginResponse>(this.routes.userLogin, { data });
 	}
 
-	async registerUser(data) {
-		return this.makePost(this.routes.userRegister, { data });
+	async registerUser<T>(data: T) {
+		return this.makePost<T, UserRegisterResponse>(this.routes.userRegister, {
+			data,
+		});
 	}
 
 	async getChatDialogs<T>(
@@ -82,6 +90,20 @@ class TransportLayer {
 	async getDialogMessages<T>(options: RequestOptions<T>) {
 		return this.makePost<T, ChatMessagesResponse>(
 			this.routes.getDialogMessages,
+			options
+		);
+	}
+
+	async updateUserInfo<T>(options: RequestOptions<T>) {
+		return this.makePost<T, UserUpdateInfoResponse>(
+			this.routes.updateMyInfo,
+			options
+		);
+	}
+
+	async uploadUserFile<T>(options: RequestFileOptions<T>) {
+		return this.makeFilePost<T, UserUploadFileResponse>(
+			this.routes.postUserAvatar,
 			options
 		);
 	}
@@ -115,11 +137,7 @@ class TransportLayer {
 			const connection = new SocketsConnectionHandler<
 				ServerToClientEvents[typeof namespace],
 				Partial<ClientsToServerEvents[typeof namespace]>
-			>(
-				this.authProvider,
-				namespace,
-				this.reactionsHandler.byNamespace[namespace]
-			);
+			>(this.authProvider, namespace, this.reactionsHandler);
 
 			if (!this.wsConnections) {
 				this.wsConnections = {};
@@ -170,6 +188,46 @@ class TransportLayer {
 					Authorization: `Bearer ${token}`,
 				},
 			});
+
+			return request.data;
+		} catch (err: AxiosError | Error | unknown) {
+			this.errorsHandler.add(err);
+			return transformError(err);
+		}
+	}
+
+	async makeFilePost<T, Res>(
+		endpoint: EndpointObject,
+		options: RequestFileOptions<T>
+	): Promise<Res | UnsuccssesRequest> {
+		const formData = new FormData();
+		formData.append('file', options.file);
+		formData.append('type', 'object');
+		formData.append(
+			'properties',
+			JSON.stringify({
+				file: {
+					type: 'string',
+					format: 'binary',
+				},
+			})
+		);
+
+		const routeText = endpoint.url(options);
+
+		const { token } = this.authProvider;
+
+		try {
+			const request: AxiosResponse<Res> = await axios.post(
+				this.getUrl(routeText),
+				formData,
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+						'content-type': 'multipart/form-data',
+					},
+				}
+			);
 
 			return request.data;
 		} catch (err: AxiosError | Error | unknown) {

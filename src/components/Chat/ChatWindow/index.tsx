@@ -2,12 +2,16 @@ import './index.css';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, Input } from 'antd';
+import Input from 'ui-components/Input';
+import Button from 'ui-components/Button';
+import { useTranslation } from 'react-i18next';
 import ChatMessageComponent from '../ChatMessage';
 import { useStore } from '../../../storage';
 import useThrottle from '../../../hooks/useThrottle';
 
 const ChatWindowComponent = observer(() => {
+	const { t } = useTranslation();
+
 	const { chat, chatUi, user } = useStore();
 
 	const [value, setValue] = useState('');
@@ -104,7 +108,7 @@ const ChatWindowComponent = observer(() => {
 			<div className="chat-window-inner">
 				{chat.currentDialog !== null ? (
 					<div
-						className="chat-window-messages"
+						className="chat-window-messages with-scrollbar"
 						onScroll={handleChatScrolling}
 						ref={chatWindowRef}
 					>
@@ -127,23 +131,16 @@ const ChatWindowComponent = observer(() => {
 					''
 				)}
 				<div className="chat-window-actions">
-					<Input.Group compact>
-						<Input
-							style={{
-								width: 'calc(100% - 200px)',
-							}}
-							value={value}
-							disabled={sendingMessage}
-							onInput={handleInput}
-						/>
-						<Button
-							type="primary"
-							onClick={handleSubmit}
-							loading={sendingMessage}
-						>
-							Send
-						</Button>
-					</Input.Group>
+					<Input
+						value={value}
+						disabled={sendingMessage}
+						onInput={handleInput}
+						placeholder={t('chat.input.placeholder')}
+						fullWidth
+					/>
+					<Button type="submit" onClick={handleSubmit}>
+						{t('chat.input.send')}
+					</Button>
 				</div>
 			</div>
 		</div>

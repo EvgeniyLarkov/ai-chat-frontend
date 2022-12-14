@@ -29,6 +29,12 @@ const endpoints: Record<string, EndpointObject> = {
 		url: ({ hash }: EndpointParameters) => `chat/${hash}`,
 		method: 'POST',
 	},
+	updateMyInfo: { url: () => 'auth/me', method: 'PATCH' },
+	getMyInfo: { url: () => 'auth/me', method: 'GET' },
+	postUserAvatar: {
+		url: () => `files/upload`,
+		method: 'POST',
+	},
 };
 
 export const wsEndpoints: Record<string, WsEndpointObject> = {

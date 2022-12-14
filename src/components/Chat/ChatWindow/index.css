@@ -1,6 +1,6 @@
 .chat-window {
     display: flex;
-    height: 100%;
+    flex: 1;
 }
 
 .chat-window-inner {
@@ -9,15 +9,17 @@
     justify-content: end;
 
     flex: 1;
-    padding-left: 20px;
-    background-color: #FFFFFF;
-    border-radius: 5px;
+    background-color: var(--greyLight-1);
 
     overflow: hidden;
 }
 
 .chat-window-actions {
-    padding: 10px 0;  
+    padding: var(--chat-conatiner-padding);
+
+    display: flex;
+    gap: 1rem;
+    border-radius: inherit;
 
     flex: 0;
 }
@@ -30,8 +32,11 @@
 
     overflow: auto;
     overflow: overlay;
+    scrollbar-gutter: stable;
+
+    padding: 0 var(--chat-conatiner-padding);
 }
 
-.chat-window-messages > :first-child {
+.chat-window-messages> :first-child {
     margin-top: auto;
 }

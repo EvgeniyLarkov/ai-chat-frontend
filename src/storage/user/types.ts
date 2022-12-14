@@ -1,3 +1,5 @@
+import { FileDto } from 'core/dto/file.dto';
+
 type UserEmail = string;
 export type UserHash = string;
 
@@ -22,7 +24,7 @@ export type UserDto = {
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: undefined | string;
-	photo: undefined | string;
+	photo: undefined | FileDto;
 	isOnline?: boolean;
 	role: {
 		id: number;
@@ -38,7 +40,24 @@ export type UserLoginData = Pick<UserDto, 'email'> & {
 	password: string;
 };
 
+export type UserUpdateInfoData = {
+	firstName?: string;
+	lastName?: string;
+	photo?: string | null;
+	newPassword?: string;
+	password?: string;
+};
+
+export type UserRegisterData = Pick<
+	UserDto,
+	'email' | 'firstName' | 'lastName'
+> & {
+	password: string;
+};
+
 export type UserLocaleData = Pick<
 	UserDto,
-	'id' | 'email' | 'firstName' | 'hash'
->;
+	'id' | 'email' | 'firstName' | 'lastName' | 'hash'
+> & {
+	photo: string | null;
+};

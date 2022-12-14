@@ -3,20 +3,18 @@
 }
 
 .chat-message {
-    border-radius: 0px 10px 10px 10px;
-    border: 1px solid rgba(112, 124, 151, 0.25);
-    padding: 10px;
+    padding: 1rem 2rem;
 
-    box-shadow: 10px 10px 25px rgba(112, 124, 151, 0.05), 15px 15px 35px rgba(112, 124, 151, 0.05);
+    box-shadow: var(--elementShadow);
+    border-radius: 1rem;
 }
 
 .chat-message-wrapper.self-message {
     justify-content: end;
-    padding-right: 20px;
 }
 
 .chat-message-wrapper.self-message .chat-message {
-    border-radius: 10px 0px 10px 10px;
-    background: linear-gradient(90.54deg, #60A9F6 0%, #2A8BF2 100%);
-    color: #FFFFFF;
+    background: var(--primary);
+    box-shadow: inset 0.2rem 0.2rem 1rem var(--primary-light), inset -0.2rem -0.2rem 1rem var(--primary-dark), 0.3rem 0.3rem 0.6rem var(--greyLight-2), -0.2rem -0.2rem 0.5rem var(--white);
+    color: var(--white);
 }

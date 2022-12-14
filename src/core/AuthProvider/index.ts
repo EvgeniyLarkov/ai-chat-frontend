@@ -1,5 +1,5 @@
 import { computed, makeAutoObservable } from 'mobx';
-import { type UserLocaleData } from 'storage/user/types';
+import { UserDto, type UserLocaleData } from 'storage/user/types';
 
 class AuthProvider {
 	token: string | null = null;

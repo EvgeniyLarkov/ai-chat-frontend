@@ -1,0 +1,11 @@
+.login-box-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.login-box-line {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}

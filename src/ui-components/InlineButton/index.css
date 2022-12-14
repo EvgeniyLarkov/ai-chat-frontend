@@ -1,0 +1,24 @@
+.inline_button {
+    position: relative;
+    height: min-content;
+
+    color: var(--primary);
+    font-size: initial;
+    text-decoration: none;
+
+    outline: none;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    border: none;
+
+    transition: color 0.3s ease-in;
+}
+
+.inline_button:hover {
+    color: var(--primary-dark);
+}
+
+.inline_button:focus {
+    outline: 1px solid #000;
+}

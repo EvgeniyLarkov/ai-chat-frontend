@@ -1,5 +1,6 @@
 .chat-outer {
     display: flex;
+    flex: 1;
 
     overflow: hidden;
     margin-left: var(--sidepanel-width-base);
@@ -8,20 +9,24 @@
 
 .chat-inner {
     padding: 2rem;
-    flex: 1;
 
     display: flex;
+    justify-content: center;
+    flex: 1;
 }
 
 .chat-container {
     --chat-conatiner-padding: 2rem;
-    padding: var(--chat-conatiner-padding) 0;
 
     display: flex;
     flex-direction: column;
+
+    max-width: 60rem;
+
     margin-left: 4rem;
 
     flex: 1;
+    overflow: hidden;
 }
 
 .chat-dialogs-inner {
@@ -29,12 +34,18 @@
     overflow: overlay;
 
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: row;
+    flex: 1;
+
+    gap: 3rem;
+    padding-left: 3rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 
 .chat-messages-container {
+    display: flex;
+
     flex: 1;
-    max-height: 100%;
     overflow: hidden;
 }
